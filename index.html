@@ -86,19 +86,83 @@
             letter-spacing: 0.01em;
         }
 
+        /* Layout with sidebar */
+        .layout {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: sticky;
+            top: 40px;
+            width: 240px;
+            flex-shrink: 0;
+            animation: fadeInUp 1s ease-out 0.1s backwards;
+        }
+
+        .sidebar-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            opacity: 0.6;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+
+        .sidebar-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 107, 53, 0.05);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-link.active {
+            color: var(--accent);
+            background: rgba(255, 107, 53, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
         /* Projects Grid */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
             margin-bottom: 80px;
         }
 
         .project-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 48px;
+            border-radius: 16px;
+            padding: 32px;
             position: relative;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -238,6 +302,41 @@
         }
 
         /* Responsive */
+        @media (max-width: 968px) {
+            .layout {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+                width: 100%;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .sidebar-item {
+                margin-bottom: 0;
+            }
+
+            .sidebar-link {
+                padding: 10px 16px;
+                border-left: none;
+                border-bottom: 2px solid transparent;
+            }
+
+            .sidebar-link:hover,
+            .sidebar-link.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--accent);
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 60px 24px;
@@ -249,11 +348,11 @@
 
             .projects-grid {
                 grid-template-columns: 1fr;
-                gap: 24px;
+                gap: 20px;
             }
 
             .project-card {
-                padding: 32px;
+                padding: 24px;
             }
         }
 
@@ -271,50 +370,61 @@
             <h1>Gallery</h1>
         </header>
 
-        <div class="projects-grid">
-            <!-- Project 1 -->
-            <a href="underwater-3d.html" class="project-card">
-                <div class="project-number">01</div>
-                <h2 class="project-title">Project: underwater-3d</h2>
-                <div class="project-link">
-                    查看项目
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                </div>
-            </a>
+        <div class="layout">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <div class="sidebar-title">项目目录</div>
+                <nav>
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-item">
+                            <a href="underwater-3d.html" class="sidebar-link">
+                                underwater-3d
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="flow-not-rules.html" class="sidebar-link">
+                                flow-not-rules
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
 
-            <!-- Project 2 -->
-            <a href="flow-not-rules.html" class="project-card">
-                <div class="project-number">02</div>
-                <h2 class="project-title">Project: flow-not-rules</h2>
-                <div class="project-link">
-                    查看项目
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                </div>
-            </a>
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="projects-grid">
+                    <!-- Project 1 -->
+                    <a href="underwater-3d.html" class="project-card">
+                        <div class="project-number">01</div>
+                        <h2 class="project-title">Project: underwater-3d</h2>
+                        <div class="project-link">
+                            查看项目
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </div>
+                    </a>
 
-            <!-- Add more project cards here as needed -->
-            <!--
-            <a href="your-next-project.html" class="project-card">
-                <div class="project-number">02</div>
-                <h2 class="project-title">Project Title</h2>
-                <p class="project-description">Project description goes here.</p>
-                <div class="project-link">
-                    查看项目
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+                    <!-- Project 2 -->
+                    <a href="flow-not-rules.html" class="project-card">
+                        <div class="project-number">02</div>
+                        <h2 class="project-title">Project: flow-not-rules</h2>
+                        <div class="project-link">
+                            查看项目
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </div>
+                    </a>
+
+                    <!-- Add more project cards here as needed -->
                 </div>
-            </a>
-            -->
+
+                <footer>
+                    <p>由 <a href="https://github.com/jeekeagle" target="_blank">@jeekeagle</a> 设计与开发</p>
+                </footer>
+            </main>
         </div>
-
-        <footer>
-            <p>由 <a href="https://github.com/jeekeagle" target="_blank">@jeekeagle</a> 设计与开发</p>
-        </footer>
     </div>
 
     <script>
@@ -346,6 +456,15 @@
 
         document.querySelectorAll('.project-card').forEach(card => {
             observer.observe(card);
+        });
+
+        // Highlight active sidebar link based on current page
+        const currentPath = window.location.pathname.split('/').pop();
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === currentPath) {
+                link.classList.add('active');
+            }
         });
     </script>
 </body>
