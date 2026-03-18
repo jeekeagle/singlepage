@@ -1,0 +1,1625 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据-模型-平台：组件化的水下三维重建一体化工作流与研发体系</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;family=Noto+Sans+SC:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           深海水科技风格 - Deep Ocean Tech
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-primary: #0a1628;
+            --bg-secondary: #0f2847;
+            --bg-card: #132f4c;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-glow: rgba(0, 212, 255, 0.15);
+            --gradient-ocean: linear-gradient(135deg, #0a1628 0%, #0f2847 50%, #132f4c 100%);
+
+            /* Typography */
+            --font-display: 'Outfit', 'Noto Sans SC', sans-serif;
+            --font-body: 'Noto Sans SC', 'Outfit', sans-serif;
+            --title-size: clamp(1.75rem, 5vw, 4rem);
+            --subtitle-size: clamp(1rem, 2.5vw, 1.5rem);
+            --h2-size: clamp(1.5rem, 4vw, 2.5rem);
+            --h3-size: clamp(1.1rem, 2vw, 1.5rem);
+            --body-size: clamp(0.8rem, 1.5vw, 1.1rem);
+            --small-size: clamp(0.7rem, 1.2vw, 0.9rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 5vw, 4rem);
+            --content-gap: clamp(1rem, 2.5vw, 2rem);
+            --element-gap: clamp(0.5rem, 1.5vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+            --duration-fast: 0.4s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* ===========================================
+           VIEWPORT FITTING BASE STYLES
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--gradient-ocean);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        /* Cards/containers */
+        .card, .container, .content-box {
+            max-width: min(90vw, 1100px);
+            max-height: min(80vh, 700px);
+        }
+
+        /* Images */
+        img, .image-container {
+            max-width: 100%;
+            max-height: min(50vh, 400px);
+            object-fit: contain;
+        }
+
+        /* ===========================================
+           BACKGROUND EFFECTS
+           =========================================== */
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 10% 90%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 10%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(20, 184, 166, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Grid pattern overlay */
+        .slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .reveal:nth-child(6) { transition-delay: 0.40s; }
+        .reveal:nth-child(7) { transition-delay: 0.47s; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        /* ===========================================
+           NAVIGATION DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(1rem, 2vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all var(--duration-fast) ease;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .nav-dot.active {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 12px var(--accent-cyan);
+            transform: scale(1.2);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY STYLES
+           =========================================== */
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: var(--title-size);
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .text-accent {
+            color: var(--accent-cyan);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===========================================
+           TITLE SLIDE
+           =========================================== */
+        .title-slide {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .title-slide .title-main {
+            font-size: var(--title-size);
+            margin-bottom: var(--element-gap);
+        }
+
+        .title-slide .title-sub {
+            font-size: var(--subtitle-size);
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: min(80vw, 700px);
+        }
+
+        .title-slide .divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            margin: var(--content-gap) auto;
+            border-radius: 2px;
+        }
+
+        /* ===========================================
+           SECTION SLIDE
+           =========================================== */
+        .section-slide {
+            justify-content: center;
+        }
+
+        .section-number {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 800;
+            color: var(--accent-cyan);
+            opacity: 0.15;
+            position: absolute;
+            right: var(--slide-padding);
+            top: 50%;
+            transform: translateY(-50%);
+            line-height: 1;
+        }
+
+        /* ===========================================
+           CONTENT SLIDE
+           =========================================== */
+        .content-slide .slide-content {
+            max-width: min(90vw, 1000px);
+            margin: 0 auto;
+        }
+
+        .content-slide h2 {
+            margin-bottom: var(--content-gap);
+        }
+
+        /* ===========================================
+           FEATURE LIST
+           =========================================== */
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 0 8px 8px 0;
+            transition: all var(--duration-fast) ease;
+        }
+
+        .feature-list li:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .feature-list li::before {
+            content: '→';
+            color: var(--accent-cyan);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           GRID LAYOUTS
+           =========================================== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: var(--content-gap);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+            gap: var(--element-gap);
+        }
+
+        /* ===========================================
+           CARDS
+           =========================================== */
+        .card {
+            background: rgba(19, 47, 76, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 16px;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            transition: all var(--duration-fast) ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--element-gap);
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: var(--small-size);
+        }
+
+        /* ===========================================
+           TIMELINE
+           =========================================== */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue));
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: var(--element-gap) 0;
+            padding-left: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -34px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           BADGE / TAG
+           =========================================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            font-size: var(--small-size);
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        .badge-current {
+            background: rgba(20, 184, 166, 0.1);
+            border-color: rgba(20, 184, 166, 0.3);
+            color: var(--accent-teal);
+        }
+
+        .badge-future {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+        }
+
+        /* ===========================================
+           ARCHITECTURE DIAGRAM
+           =========================================== */
+        .arch-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        .arch-layer {
+            display: flex;
+            align-items: center;
+            gap: var(--element-gap);
+            padding: 16px 20px;
+            background: rgba(19, 47, 76, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .arch-label {
+            min-width: 100px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            font-size: var(--small-size);
+        }
+
+        .arch-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .arch-item {
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.08);
+            border-radius: 8px;
+            font-size: var(--small-size);
+            color: var(--text-primary);
+        }
+
+        /* ===========================================
+           FLOW DIAGRAM
+           =========================================== */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            flex-wrap: wrap;
+        }
+
+        .flow-box {
+            padding: 16px 24px;
+            background: rgba(19, 47, 76, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .flow-arrow {
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+        }
+
+        /* ===========================================
+           KEYWORD HIGHLIGHT
+           =========================================== */
+        .keyword {
+            display: inline;
+            padding: 2px 8px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        /* ===========================================
+           RESPONSIVE BREAKPOINTS
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2rem);
+                --content-gap: clamp(0.75rem, 1.5vw, 1.25rem);
+            }
+            .section-number {
+                font-size: clamp(2rem, 8vw, 5rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.5rem, 1vw, 0.75rem);
+            }
+            .nav-dots, .section-number {
+                display: none;
+            }
+            .feature-list li {
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .flow-container {
+                flex-direction: column;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* ===========================================
+           REDUCED MOTION
+           =========================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+        }
+
+        /* ===========================================
+           EDIT MODE TOOLBAR
+           =========================================== */
+        .edit-toolbar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            display: flex;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .edit-toolbar.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .edit-toolbar:hover {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        .toolbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: var(--accent-cyan);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-body);
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .toolbar-btn.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .toolbar-btn.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .toolbar-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .toolbar-btn.success {
+            background: rgba(20, 184, 166, 0.1);
+            border-color: rgba(20, 184, 166, 0.3);
+            color: var(--accent-teal);
+        }
+
+        .toolbar-btn.success:hover {
+            background: rgba(20, 184, 166, 0.2);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 4px 4px;
+        }
+
+        /* ===========================================
+           EDIT MODE STYLES
+           =========================================== */
+        body.edit-mode .slide {
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        body.edit-mode .slide:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        body.edit-mode .slide.current-edit {
+            border-color: var(--accent-cyan);
+        }
+
+        /* Editable text elements */
+        body.edit-mode [data-editable] {
+            cursor: text;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        body.edit-mode [data-editable]:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        body.edit-mode [data-editable]:focus {
+            outline: none;
+            background: rgba(0, 212, 255, 0.15);
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+        }
+
+        /* ===========================================
+           SLIDE DELETE BUTTON
+           =========================================== */
+        .slide-delete-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #ef4444;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        body.edit-mode .slide-delete-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .slide-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* ===========================================
+           TOAST NOTIFICATION
+           =========================================== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: rgba(10, 22, 40, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            border-color: rgba(20, 184, 166, 0.5);
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        /* ===========================================
+           EDIT MODE HINT
+           =========================================== */
+        .edit-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        body.edit-mode .edit-hint {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar" style="width: 31.25%;"></div>
+    <nav class="nav-dots" id="navDots"><button class="nav-dot" aria-label="Go to slide 1"></button><button class="nav-dot" aria-label="Go to slide 2"></button><button class="nav-dot" aria-label="Go to slide 3"></button><button class="nav-dot" aria-label="Go to slide 4"></button><button class="nav-dot active" aria-label="Go to slide 5"></button><button class="nav-dot" aria-label="Go to slide 6"></button><button class="nav-dot" aria-label="Go to slide 7"></button><button class="nav-dot" aria-label="Go to slide 8"></button><button class="nav-dot" aria-label="Go to slide 9"></button><button class="nav-dot" aria-label="Go to slide 10"></button><button class="nav-dot" aria-label="Go to slide 11"></button><button class="nav-dot" aria-label="Go to slide 12"></button><button class="nav-dot" aria-label="Go to slide 13"></button><button class="nav-dot" aria-label="Go to slide 14"></button><button class="nav-dot" aria-label="Go to slide 15"></button><button class="nav-dot" aria-label="Go to slide 16"></button></nav>
+
+    <!-- Edit Toolbar -->
+    <div class="edit-toolbar" id="editToolbar" style="display: none;">
+        <button class="toolbar-btn" id="editModeBtn" title="切换编辑模式 (E)">
+            <span>✏️</span>
+            <span>编辑</span>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="toolbar-btn success" id="saveBtn" title="保存到浏览器 (Ctrl+S)">
+            <span>💾</span>
+            <span>保存</span>
+        </button>
+        <button class="toolbar-btn" id="exportBtn" title="导出 HTML 文件">
+            <span>📤</span>
+            <span>导出</span>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="toolbar-btn danger" id="resetBtn" title="重置为原始内容">
+            <span>🔄</span>
+            <span>重置</span>
+        </button>
+    </div>
+
+    <!-- Edit Mode Hint -->
+    <div class="edit-hint" style="display: none;">按 <strong>E</strong> 退出编辑模式 · <strong>Ctrl+S</strong> 保存 · 点击文字可编辑</div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Slide 1: Title -->
+    <section class="slide title-slide visible">
+        <div class="reveal-scale">
+            <h1 class="title-main">
+                <span class="text-gradient">数据-模型-平台</span>
+            </h1>
+        </div>
+        <div class="reveal">
+            <p class="title-sub">组件化的水下三维重建一体化工作流与研发体系</p>
+        </div>
+        <div class="divider reveal"></div>
+        <p class="reveal" style="color: var(--text-muted); font-size: var(--small-size);">水下视觉智能实验室</p>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 2: 研发痛点 -->
+    <section class="slide content-slide visible">
+        <div class="slide-content">
+            <h2 class="reveal">研发痛点<span class="text-accent">：水下三维重建的三重困境</span></h2>
+            <div class="grid-3">
+                <div class="card reveal">
+                    <div class="card-icon">📊</div>
+                    <h3>数据匮乏</h3>
+                    <p>水下环境复杂多变，真实采集数据稀缺且标注成本高昂，形成算法训练的"无米之炊"</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">🔗</div>
+                    <h3>算法孤岛</h3>
+                    <p>各类算法独立开发、各自为战，缺乏统一的验证平台和标准化流程</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">🚀</div>
+                    <h3>部署困难</h3>
+                    <p>从算法到产品的转化链路长、门槛高，产业端难以快速接入和应用</p>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 3: 演进路径 -->
+    <section class="slide content-slide visible">
+        <div class="slide-content">
+            <h2 class="reveal">演进路径<span class="text-accent">：从数据到平台的跨越</span></h2>
+            <div class="timeline reveal">
+                <div class="timeline-item">
+                    <div class="timeline-title">起点 · 数据主动权</div>
+                    <div class="timeline-desc">从水下虚拟数据生成起家，解决"无米之炊"问题，掌握数据生成核心能力</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">发展 · 技术闭环</div>
+                    <div class="timeline-desc">引入算法验证模块，打通"数据→算法→评估"完整链路</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">现状 · 一体化工作流</div>
+                    <div class="timeline-desc">集分析、模型、数据于一体的端到端平台，支持云端在线调用</div>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 4: 核心优势 -->
+    <section class="slide content-slide visible">
+        <div class="slide-content">
+            <h2 class="reveal">核心优势<span class="text-accent">：组件化 + 轻量化</span></h2>
+            <div class="grid-2">
+                <div class="card reveal">
+                    <h3 style="color: var(--accent-cyan);">🧩 组件化开发理念</h3>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li>数据、模型、平台各层独立可替换</li>
+                        <li>新算法可无缝"插拔"接入</li>
+                        <li>灵活组合满足多样化需求</li>
+                    </ul>
+                </div>
+                <div class="card reveal">
+                    <h3 style="color: var(--accent-cyan);">☁️ 云端轻量化体验</h3>
+                    <div class="flow-container" style="margin-top: 16px;">
+                        <div class="flow-box">上传数据</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box">调用 API</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box">生成结果</div>
+                    </div>
+                    <p style="margin-top: 16px; font-size: var(--small-size);">零部署成本，即开即用的在线服务</p>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 5: 核心架构概览 -->
+    <section class="slide section-slide visible">
+        <div class="slide-content">
+            <span class="section-number">01</span>
+            <div class="reveal">
+                <span class="badge">PART ONE</span>
+            </div>
+            <h2 class="reveal" style="margin-top: 16px;">核心架构</h2>
+            <p class="reveal" style="color: var(--text-secondary); margin-top: 8px;">三大平台底座：数据基座 · 模型矩阵 · 开发平台</p>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 6: 数据基座 -->
+    <section class="slide content-slide visible">
+        <div class="slide-content">
+            <h2 class="reveal">数据基座<span class="text-accent">：双擎驱动</span></h2>
+            <div class="grid-2">
+                <div class="card reveal">
+                    <div class="card-icon">📥</div>
+                    <h3>真实数据导入</h3>
+                    <p>支持产业端真实场景数据接入，兼容多种水下相机和传感器格式</p>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li>多源数据标准化处理</li>
+                        <li>自动标定与对齐</li>
+                    </ul>
+                </div>
+                <div class="card reveal" style="border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);">
+                    <div class="card-icon">🔮</div>
+                    <h3>虚拟生成数据 <span class="badge" style="margin-left: 8px;">核心壁垒</span></h3>
+                    <p>当真实数据不足时，通过高保真虚拟生成进行算法训练和兜底</p>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li>物理真实的水下光学仿真</li>
+                        <li>多样化场景自动生成</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 7: 模型矩阵 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">模型矩阵<span class="text-accent">：广度与深度兼顾</span></h2>
+            <div class="grid-2">
+                <div class="card reveal">
+                    <div class="card-icon">🌐</div>
+                    <h3>开源模型集成</h3>
+                    <p>站在巨人的肩膀上，快速响应通用需求</p>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li>SOTA 立体匹配算法集成</li>
+                        <li>持续跟踪前沿研究成果</li>
+                        <li>标准化接口统一封装</li>
+                    </ul>
+                </div>
+                <div class="card reveal" style="border-color: rgba(0, 212, 255, 0.4);">
+                    <div class="card-icon">⚙️</div>
+                    <h3>产业定制模型</h3>
+                    <p>针对水下复杂场景自研，解决"卡脖子"问题</p>
+                    <ul class="feature-list" style="margin-top: 12px;">
+                        <li>浑浊水体鲁棒算法</li>
+                        <li>光照不均场景适配</li>
+                        <li>水下色彩校正增强</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 8: 集成化开发平台 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">集成化开发平台<span class="text-accent">：不只是黑盒工具</span></h2>
+            <div class="arch-container reveal">
+                <div class="arch-layer">
+                    <span class="arch-label">用户入口</span>
+                    <div class="arch-items">
+                        <span class="arch-item">Web 界面</span>
+                        <span class="arch-item">API 接口</span>
+                        <span class="arch-item">SDK 工具包</span>
+                    </div>
+                </div>
+                <div class="arch-layer">
+                    <span class="arch-label">核心服务</span>
+                    <div class="arch-items">
+                        <span class="arch-item">数据处理引擎</span>
+                        <span class="arch-item">模型推理服务</span>
+                        <span class="arch-item">结果可视化</span>
+                    </div>
+                </div>
+                <div class="arch-layer">
+                    <span class="arch-label">扩展能力</span>
+                    <div class="arch-items">
+                        <span class="arch-item">自定义模型接入</span>
+                        <span class="arch-item">二次开发接口</span>
+                        <span class="arch-item">私有化部署</span>
+                    </div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top: var(--content-gap); color: var(--text-muted); font-size: var(--small-size);">支持产业客户和开发者灵活接入与扩展</p>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 9: 技术引擎 -->
+    <section class="slide section-slide">
+        <div class="slide-content">
+            <span class="section-number">02</span>
+            <div class="reveal">
+                <span class="badge">PART TWO</span>
+            </div>
+            <h2 class="reveal" style="margin-top: 16px;">技术引擎与前瞻布局</h2>
+            <p class="reveal" style="color: var(--text-secondary); margin-top: 8px;">当下能打的核心技术 · 仰望星空的前沿视野</p>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 10: 当打之年 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">当打之年<span class="text-accent">：核心技术引擎</span></h2>
+            <div class="card reveal" style="max-width: 100%;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <span class="badge badge-current">核心支撑</span>
+                    <h3 style="margin: 0;">水下立体匹配算法</h3>
+                </div>
+                <p>当前三维重建的核心技术支撑，针对水下环境特性进行深度优化</p>
+                <ul class="feature-list" style="margin-top: 16px;">
+                    <li><strong>鲁棒性</strong>：在浑浊、低对比度水下场景中保持稳定性能</li>
+                    <li><strong>准确度</strong>：亚像素级匹配精度，支持高精度三维重建</li>
+                    <li><strong>实时性</strong>：GPU 加速，满足在线处理需求</li>
+                </ul>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 11: 近期研发突破 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">近期研发突破<span class="text-accent">：从"看见"到"看懂"</span></h2>
+            <div class="card reveal" style="border-color: rgba(20, 184, 166, 0.4); max-width: 100%;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <span class="badge badge-current">攻坚中</span>
+                    <h3 style="margin: 0;">水下实例分割算法</h3>
+                </div>
+                <p style="margin-bottom: 16px;">将实例分割与立体匹配/三维重建深度融合</p>
+                <div class="grid-2">
+                    <div style="padding: 12px; background: rgba(20, 184, 166, 0.05); border-radius: 8px;">
+                        <strong style="color: var(--accent-teal);">Before</strong>
+                        <p style="font-size: var(--small-size); margin-top: 4px;">重建三维世界，但不知道物体是什么</p>
+                    </div>
+                    <div style="padding: 12px; background: rgba(0, 212, 255, 0.08); border-radius: 8px;">
+                        <strong style="color: var(--accent-cyan);">After</strong>
+                        <p style="font-size: var(--small-size); margin-top: 4px;">理解水下具体物体：管线、生物、设备...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 12: 未来雷达 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">未来雷达<span class="text-accent">：前沿技术预研</span></h2>
+            <p class="reveal" style="margin-bottom: var(--content-gap); color: var(--text-secondary);">体系架构具备包容性，新技术可作为"组件"无缝插拔</p>
+            <div class="grid-2">
+                <div class="card reveal" style="border-color: rgba(59, 130, 246, 0.3);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span class="badge badge-future">Future</span>
+                        <h3 style="margin: 0; font-size: var(--h3-size);">3D Gaussian Splatting</h3>
+                    </div>
+                    <p style="font-size: var(--small-size);">新兴的显式三维表示方法，渲染速度与质量双优</p>
+                </div>
+                <div class="card reveal" style="border-color: rgba(59, 130, 246, 0.3);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span class="badge badge-future">Future</span>
+                        <h3 style="margin: 0; font-size: var(--h3-size);">NeRF 神经辐射场</h3>
+                    </div>
+                    <p style="font-size: var(--small-size);">隐式神经表示，支持复杂场景的高质量新视角合成</p>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 13: 产品化 -->
+    <section class="slide section-slide">
+        <div class="slide-content">
+            <span class="section-number">03</span>
+            <div class="reveal">
+                <span class="badge">PART THREE</span>
+            </div>
+            <h2 class="reveal" style="margin-top: 16px;">产品化与产业赋能</h2>
+            <p class="reveal" style="color: var(--text-secondary); margin-top: 8px;">标准化 · 开箱即用 · 场景落地</p>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 14: 产品形态 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">产品形态<span class="text-accent">：一体化能力封装</span></h2>
+            <div class="card reveal" style="max-width: 100%; text-align: center; padding: clamp(1.5rem, 3vw, 2.5rem);">
+                <p style="font-size: var(--h3-size); color: var(--text-primary); margin-bottom: 16px;">将所有能力包装成标准化产品</p>
+                <div class="flow-container">
+                    <div class="flow-box">
+                        <div style="font-size: var(--small-size); color: var(--text-muted);">数据层</div>
+                        <div style="font-weight: 600; margin-top: 4px;">真实+虚拟数据</div>
+                    </div>
+                    <span class="flow-arrow">+</span>
+                    <div class="flow-box">
+                        <div style="font-size: var(--small-size); color: var(--text-muted);">模型层</div>
+                        <div style="font-weight: 600; margin-top: 4px;">开源+定制模型</div>
+                    </div>
+                    <span class="flow-arrow">+</span>
+                    <div class="flow-box">
+                        <div style="font-size: var(--small-size); color: var(--text-muted);">平台层</div>
+                        <div style="font-weight: 600; margin-top: 4px;">API+可视化</div>
+                    </div>
+                    <span class="flow-arrow">=</span>
+                    <div class="flow-box" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(59, 130, 246, 0.2)); border-color: var(--accent-cyan);">
+                        <div style="font-size: var(--small-size); color: var(--accent-cyan);">产品</div>
+                        <div style="font-weight: 700; margin-top: 4px;">开箱即用</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 15: 应用场景 -->
+    <section class="slide content-slide">
+        <div class="slide-content">
+            <h2 class="reveal">应用场景<span class="text-accent">：产业赋能展望</span></h2>
+            <div class="grid-3">
+                <div class="card reveal">
+                    <div class="card-icon">🔧</div>
+                    <h3>海洋工程</h3>
+                    <p>水下管道、油气平台的三维巡检与形变分析</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">🐟</div>
+                    <h3>水产养殖</h3>
+                    <p>水下生物的三维体尺测量与状态评估</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">🤖</div>
+                    <h3>水下机器人</h3>
+                    <p>ROV/AUV 视觉感知与环境建图增强</p>
+                </div>
+            </div>
+            <p class="reveal" style="text-align: center; margin-top: var(--content-gap); color: var(--text-muted); font-size: var(--small-size);">更多应用场景持续探索中...</p>
+        </div>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <!-- Slide 16: 结束页 -->
+    <section class="slide title-slide">
+        <div class="reveal-scale">
+            <h1 class="title-main">
+                <span class="text-gradient">Thank You</span>
+            </h1>
+        </div>
+        <div class="divider reveal"></div>
+        <p class="reveal" style="color: var(--text-secondary);">数据驱动 · 模型赋能 · 平台协作</p>
+        <p class="reveal" style="color: var(--text-muted); font-size: var(--small-size); margin-top: 8px;">水下视觉智能实验室</p>
+    <button class="slide-delete-btn" title="删除此页 (Delete)" style="display: none;">×</button></section>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.getElementById('progressBar');
+                this.navDots = document.getElementById('navDots');
+                this.editToolbar = document.getElementById('editToolbar');
+                this.toast = document.getElementById('toast');
+                this.currentSlide = 0;
+                this.isEditMode = false;
+                this.originalContent = null;
+
+                this.init();
+            }
+
+            init() {
+                this.saveOriginalContent();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupNavDots();
+                this.setupEditMode();
+                this.updateProgressBar();
+                this.loadFromStorage();
+                this.showToolbarHint();
+            }
+
+            saveOriginalContent() {
+                this.originalContent = document.body.innerHTML;
+            }
+
+            showToolbarHint() {
+                // Show toolbar briefly on load
+                this.editToolbar.classList.add('visible');
+                setTimeout(() => {
+                    if (!this.isEditMode) {
+                        this.editToolbar.classList.remove('visible');
+                    }
+                }, 3000);
+
+                // Show toolbar on hover near top-left
+                document.addEventListener('mousemove', (e) => {
+                    if (e.clientX < 150 && e.clientY < 100) {
+                        this.editToolbar.classList.add('visible');
+                    } else if (!this.isEditMode) {
+                        this.editToolbar.classList.remove('visible');
+                    }
+                });
+            }
+
+            setupIntersectionObserver() {
+                const options = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.5
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                            this.updateNavDots();
+                            this.updateProgressBar();
+                            this.updateCurrentEditSlide(entry.target);
+                        }
+                    });
+                }, options);
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            updateCurrentEditSlide(currentSlide) {
+                if (this.isEditMode) {
+                    document.querySelectorAll('.slide').forEach(s => s.classList.remove('current-edit'));
+                    currentSlide.classList.add('current-edit');
+                }
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    // Toggle edit mode with 'E' key
+                    if (e.key === 'e' || e.key === 'E') {
+                        if (!e.target.matches('[contenteditable="true"]')) {
+                            e.preventDefault();
+                            this.toggleEditMode();
+                            return;
+                        }
+                    }
+
+                    // Save with Ctrl+S
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        this.saveToStorage();
+                        return;
+                    }
+
+                    // Don't navigate while editing text
+                    if (e.target.matches('[contenteditable="true"]')) {
+                        return;
+                    }
+
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                        e.preventDefault();
+                        this.goToSlide(this.currentSlide + 1);
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.goToSlide(this.currentSlide - 1);
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        this.goToSlide(0);
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        this.goToSlide(this.slides.length - 1);
+                    } else if (e.key === 'Delete' && this.isEditMode) {
+                        e.preventDefault();
+                        this.deleteCurrentSlide();
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let touchStartY = 0;
+                let touchEndY = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    touchStartY = e.changedTouches[0].screenY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    touchEndY = e.changedTouches[0].screenY;
+                    this.handleSwipe();
+                }, { passive: true });
+
+                const handleSwipe = () => {
+                    const swipeThreshold = 50;
+                    const diff = touchStartY - touchEndY;
+
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            this.goToSlide(this.currentSlide + 1);
+                        } else {
+                            this.goToSlide(this.currentSlide - 1);
+                        }
+                    }
+                };
+                this.handleSwipe = handleSwipe;
+            }
+
+            setupNavDots() {
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                // Clear existing dots
+                this.navDots.innerHTML = '';
+
+                // Recreate dots based on current slides
+                const currentSlides = document.querySelectorAll('.slide');
+                currentSlides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    if (index === this.currentSlide) dot.classList.add('active');
+                    dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+            }
+
+            updateProgressBar() {
+                const currentSlides = document.querySelectorAll('.slide');
+                const progress = ((this.currentSlide + 1) / currentSlides.length) * 100;
+                this.progressBar.style.width = `${progress}%`;
+            }
+
+            goToSlide(index) {
+                const currentSlides = document.querySelectorAll('.slide');
+                if (index < 0 || index >= currentSlides.length || index === this.currentSlide) return;
+
+                currentSlides[index].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+
+            /* ===========================================
+               EDIT MODE FUNCTIONALITY
+               =========================================== */
+            setupEditMode() {
+                const editModeBtn = document.getElementById('editModeBtn');
+                const saveBtn = document.getElementById('saveBtn');
+                const exportBtn = document.getElementById('exportBtn');
+                const resetBtn = document.getElementById('resetBtn');
+
+                editModeBtn.addEventListener('click', () => this.toggleEditMode());
+                saveBtn.addEventListener('click', () => this.saveToStorage());
+                exportBtn.addEventListener('click', () => this.exportHTML());
+                resetBtn.addEventListener('click', () => this.resetContent());
+
+                // Add delete buttons to slides
+                this.addDeleteButtons();
+            }
+
+            addDeleteButtons() {
+                document.querySelectorAll('.slide').forEach((slide, index) => {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'slide-delete-btn';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.title = '删除此页 (Delete)';
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.deleteSlide(index);
+                    });
+                    slide.appendChild(deleteBtn);
+                });
+            }
+
+            toggleEditMode() {
+                this.isEditMode = !this.isEditMode;
+                document.body.classList.toggle('edit-mode', this.isEditMode);
+
+                const editModeBtn = document.getElementById('editModeBtn');
+                editModeBtn.classList.toggle('active', this.isEditMode);
+
+                if (this.isEditMode) {
+                    this.editToolbar.classList.add('visible');
+                    this.makeEditable();
+                    this.showToast('编辑模式已开启 - 点击文字可编辑', 'success');
+                } else {
+                    this.editToolbar.classList.remove('visible');
+                    this.makeNonEditable();
+                    this.showToast('编辑模式已关闭');
+                }
+            }
+
+            makeEditable() {
+                // Make text elements editable
+                const editableSelectors = 'h1, h2, h3, p, .timeline-title, .timeline-desc, .arch-item, .flow-box div, li';
+                document.querySelectorAll(editableSelectors).forEach(el => {
+                    if (!el.querySelector('*')) { // Only leaf text nodes
+                        el.setAttribute('data-editable', 'true');
+                        el.setAttribute('contenteditable', 'true');
+                    }
+                });
+
+                // Handle special cases for elements with children
+                document.querySelectorAll('.card h3, .card p').forEach(el => {
+                    el.setAttribute('data-editable', 'true');
+                    el.setAttribute('contenteditable', 'true');
+                });
+            }
+
+            makeNonEditable() {
+                document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+                    el.removeAttribute('contenteditable');
+                });
+            }
+
+            deleteSlide(index) {
+                const currentSlides = document.querySelectorAll('.slide');
+                if (currentSlides.length <= 1) {
+                    this.showToast('至少保留一页幻灯片', 'error');
+                    return;
+                }
+
+                if (confirm(`确定要删除第 ${index + 1} 页吗？`)) {
+                    currentSlides[index].remove();
+                    this.slides = document.querySelectorAll('.slide');
+
+                    // Adjust current slide index
+                    if (this.currentSlide >= this.slides.length) {
+                        this.currentSlide = this.slides.length - 1;
+                    }
+
+                    this.updateNavDots();
+                    this.updateProgressBar();
+                    this.goToSlide(Math.max(0, this.currentSlide));
+                    this.showToast(`已删除第 ${index + 1} 页`, 'success');
+                }
+            }
+
+            deleteCurrentSlide() {
+                this.deleteSlide(this.currentSlide);
+            }
+
+            saveToStorage() {
+                // Remove contenteditable before saving
+                const editables = document.querySelectorAll('[contenteditable="true"]');
+                editables.forEach(el => el.removeAttribute('contenteditable'));
+
+                const content = document.documentElement.outerHTML;
+                localStorage.setItem('underwater-slides-content', content);
+                localStorage.setItem('underwater-slides-saved', new Date().toISOString());
+
+                // Restore contenteditable if in edit mode
+                if (this.isEditMode) {
+                    editables.forEach(el => el.setAttribute('contenteditable', 'true'));
+                }
+
+                this.showToast('已保存到浏览器', 'success');
+            }
+
+            loadFromStorage() {
+                const savedContent = localStorage.getItem('underwater-slides-content');
+                if (savedContent) {
+                    const savedTime = localStorage.getItem('underwater-slides-saved');
+                    const timeAgo = this.getTimeAgo(new Date(savedTime));
+
+                    if (confirm(`发现 ${timeAgo} 保存的版本，是否恢复？\n\n点击"取消"将使用原始版本。`)) {
+                        document.documentElement.innerHTML = savedContent;
+                        this.slides = document.querySelectorAll('.slide');
+                        this.reinitializeAfterLoad();
+                        this.showToast(`已恢复 ${timeAgo} 保存的版本`, 'success');
+                    }
+                }
+            }
+
+            reinitializeAfterLoad() {
+                // Re-add delete buttons
+                document.querySelectorAll('.slide-delete-btn').forEach(btn => btn.remove());
+                this.addDeleteButtons();
+
+                // Update navigation
+                this.updateNavDots();
+                this.updateProgressBar();
+
+                // Re-setup edit mode if needed
+                if (this.isEditMode) {
+                    this.makeEditable();
+                }
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+
+                if (days > 0) return `${days} 天前`;
+                if (hours > 0) return `${hours} 小时前`;
+                if (minutes > 0) return `${minutes} 分钟前`;
+                return '刚刚';
+            }
+
+            exportHTML() {
+                // Remove edit-related elements before export
+                const editToolbar = document.getElementById('editToolbar');
+                const editHint = document.querySelector('.edit-hint');
+                const deleteBtns = document.querySelectorAll('.slide-delete-btn');
+
+                editToolbar.style.display = 'none';
+                if (editHint) editHint.style.display = 'none';
+                deleteBtns.forEach(btn => btn.style.display = 'none');
+
+                // Remove contenteditable attributes
+                document.querySelectorAll('[contenteditable]').forEach(el => {
+                    el.removeAttribute('contenteditable');
+                });
+
+                // Remove edit-mode class
+                document.body.classList.remove('edit-mode');
+
+                const content = document.documentElement.outerHTML;
+
+                // Create download
+                const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'underwater-3d-reconstruction-slides-edited.html';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                // Restore elements
+                editToolbar.style.display = '';
+                if (editHint) editHint.style.display = '';
+                deleteBtns.forEach(btn => btn.style.display = '');
+
+                if (this.isEditMode) {
+                    this.makeEditable();
+                    document.body.classList.add('edit-mode');
+                }
+
+                this.showToast('已导出 HTML 文件', 'success');
+            }
+
+            resetContent() {
+                if (confirm('确定要重置为原始内容吗？\n\n这将丢失所有未保存的修改。')) {
+                    localStorage.removeItem('underwater-slides-content');
+                    localStorage.removeItem('underwater-slides-saved');
+                    document.documentElement.innerHTML = this.originalContent;
+                    this.slides = document.querySelectorAll('.slide');
+                    this.reinitializeAfterLoad();
+                    this.isEditMode = false;
+                    document.body.classList.remove('edit-mode');
+                    document.getElementById('editModeBtn').classList.remove('active');
+                    this.showToast('已重置为原始内容', 'success');
+                }
+            }
+
+            showToast(message, type = 'info') {
+                this.toast.textContent = message;
+                this.toast.className = 'toast ' + type;
+                this.toast.classList.add('show');
+
+                setTimeout(() => {
+                    this.toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize presentation
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+        });
+    </script>
+
+
+</body></html>
