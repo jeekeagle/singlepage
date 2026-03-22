@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery</title>
+    <title>Gallery — Liquid Glass</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #151520;
-            --text-primary: #f5f5f7;
-            --text-secondary: #8b8b8f;
-            --accent: #ff6b35;
-            --accent-glow: rgba(255, 107, 53, 0.3);
-            --card-bg: #1a1a24;
-            --card-hover: #222230;
-            --border: #2a2a35;
+            --bg: #08080c;
+            --fg: #f0f0f5;
+            --muted: #6b6b80;
+            --accent: #00f5d4;
+            --accent-secondary: #7b61ff;
+            --card-glass: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --sidebar-width: 260px;
         }
 
         * {
@@ -27,479 +26,495 @@
         }
 
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Geist', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Ambient background effect */
+        /* Animated gradient mesh background */
         body::before {
             content: '';
             position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 50%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(107, 35, 255, 0.05) 0%, transparent 40%);
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(0, 245, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 80% at 80% 60%, rgba(123, 97, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 50% at 50% 100%, rgba(255, 107, 53, 0.08) 0%, transparent 40%);
+            animation: meshMove 15s ease-in-out infinite;
             z-index: -1;
-            animation: ambientMove 20s ease-in-out infinite;
         }
 
-        @keyframes ambientMove {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-2%, -2%); }
+        @keyframes meshMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 80px 40px;
-        }
-
-        /* Header */
-        header {
-            margin-bottom: 100px;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        h1 {
-            font-family: 'Crimson Pro', serif;
-            font-size: clamp(2rem, 5vw, 4rem);
-            font-weight: 300;
-            letter-spacing: -0.02em;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            color: var(--text-secondary);
-            max-width: 600px;
-            font-weight: 400;
-            letter-spacing: 0.01em;
-        }
-
-        /* Layout with sidebar */
+        /* Layout */
         .layout {
             display: flex;
-            gap: 60px;
-            align-items: flex-start;
+            min-height: 100vh;
         }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         .sidebar {
-            position: sticky;
-            top: 40px;
-            width: 240px;
-            flex-shrink: 0;
-            animation: fadeInUp 1s ease-out 0.1s backwards;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            padding: 40px 24px;
+            background: rgba(8, 8, 12, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
         }
 
-        .sidebar-title {
-            font-family: 'Crimson Pro', serif;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 24px;
-            opacity: 0.6;
+        .sidebar-header {
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: var(--fg);
+            font-style: italic;
+        }
+
+        .logo-accent {
+            color: var(--accent);
         }
 
         .sidebar-nav {
+            flex: 1;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 16px;
+            padding-left: 12px;
+        }
+
+        .nav-list {
             list-style: none;
         }
 
-        .sidebar-item {
-            margin-bottom: 12px;
+        .nav-item {
+            margin-bottom: 4px;
         }
 
-        .sidebar-link {
-            display: block;
-            padding: 12px 16px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9375rem;
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
             border-radius: 12px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
-            border-left: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
         }
 
-        .sidebar-link:hover {
-            color: var(--text-primary);
-            background: rgba(255, 107, 53, 0.05);
-            border-left-color: var(--accent);
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--accent);
+            border-radius: 0 2px 2px 0;
+            transition: height 0.3s ease;
         }
 
-        .sidebar-link.active {
+        .nav-link:hover {
+            color: var(--fg);
+            background: var(--card-glass);
+        }
+
+        .nav-link:hover::before {
+            height: 20px;
+        }
+
+        .nav-link.active {
             color: var(--accent);
-            background: rgba(255, 107, 53, 0.1);
-            border-left-color: var(--accent);
+            background: rgba(0, 245, 212, 0.05);
         }
 
-        /* Main content */
+        .nav-link.active::before {
+            height: 20px;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
+        }
+
+        .sidebar-footer {
+            padding-top: 24px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .sidebar-footer a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-footer a:hover {
+            color: var(--accent);
+        }
+
+        /* Main Content */
         .main-content {
             flex: 1;
-            min-width: 0;
+            margin-left: var(--sidebar-width);
+            padding: 60px 50px;
+        }
+
+        /* Header */
+        .page-header {
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--fg) 0%, var(--muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-tagline {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-top: 12px;
+            font-weight: 300;
         }
 
         /* Projects Grid */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 80px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
 
+        /* Liquid Glass Card - Compact */
         .project-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
             position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            padding: 24px 28px;
+            background: var(--card-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
             text-decoration: none;
             color: inherit;
-            display: block;
-            animation: fadeInUp 1s ease-out backwards;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80px;
         }
 
-        .project-card:nth-child(1) { animation-delay: 0.2s; }
-        .project-card:nth-child(2) { animation-delay: 0.3s; }
-        .project-card:nth-child(3) { animation-delay: 0.4s; }
-        .project-card:nth-child(4) { animation-delay: 0.5s; }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* Animated gradient border */
         .project-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), rgba(255, 107, 53, 0));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            inset: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                var(--accent) 0%,
+                var(--accent-secondary) 50%,
+                var(--accent) 100%
+            );
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
 
         .project-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .project-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                        var(--accent-glow) 0%,
-                        transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .project-card:hover::after {
             opacity: 1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
         }
 
         .project-card:hover {
-            background: var(--card-hover);
-            border-color: var(--accent);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
-                        0 0 40px var(--accent-glow);
+            transform: translateY(-6px) scale(1.01);
+            box-shadow:
+                0 20px 40px -15px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(0, 245, 212, 0.1);
         }
 
-        .project-number {
-            font-family: 'Crimson Pro', serif;
-            font-size: 0.875rem;
+        .card-content {
+            flex: 1;
+        }
+
+        .card-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 0.65rem;
             color: var(--accent);
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            margin-bottom: 16px;
+            letter-spacing: 0.2em;
+            margin-bottom: 6px;
             opacity: 0.8;
         }
 
-        .project-title {
-            font-family: 'Crimson Pro', serif;
-            font-size: clamp(1.75rem, 4vw, 2.25rem);
+        .card-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.25rem;
             font-weight: 400;
-            margin-bottom: 16px;
-            color: var(--text-primary);
             letter-spacing: -0.01em;
+            font-style: italic;
         }
 
-        .project-description {
-            font-size: 0.9375rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 32px;
-        }
-
-        .project-link {
-            display: inline-flex;
+        .card-arrow {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-glass);
+            border-radius: 50%;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--accent);
-            font-weight: 500;
-            font-size: 0.9375rem;
-            transition: gap 0.3s ease;
+            justify-content: center;
+            transition: all 0.4s ease;
+            flex-shrink: 0;
         }
 
-        .project-link svg {
-            width: 20px;
-            height: 20px;
-            transition: transform 0.3s ease;
+        .card-arrow svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--muted);
+            transition: all 0.4s ease;
         }
 
-        .project-card:hover .project-link {
-            gap: 12px;
+        .project-card:hover .card-arrow {
+            border-color: var(--accent);
+            background: rgba(0, 245, 212, 0.1);
         }
 
-        .project-card:hover .project-link svg {
-            transform: translateX(4px);
+        .project-card:hover .card-arrow svg {
+            stroke: var(--accent);
+            transform: translateX(3px);
         }
 
         /* Footer */
-        footer {
+        .page-footer {
+            margin-top: 80px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-glass);
             text-align: center;
-            padding: 40px 0;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            animation: fadeInUp 1s ease-out 0.6s backwards;
+            color: var(--muted);
+            font-size: 0.85rem;
         }
 
-        footer a {
+        .page-footer a {
             color: var(--accent);
             text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s ease;
-        }
-
-        footer a:hover {
-            opacity: 0.8;
         }
 
         /* Responsive */
-        @media (max-width: 968px) {
-            .layout {
-                flex-direction: column;
-                gap: 40px;
-            }
-
+        @media (max-width: 1024px) {
             .sidebar {
-                position: relative;
-                top: 0;
-                width: 100%;
+                width: 220px;
             }
-
-            .sidebar-nav {
-                display: flex;
-                gap: 12px;
-                flex-wrap: wrap;
-            }
-
-            .sidebar-item {
-                margin-bottom: 0;
-            }
-
-            .sidebar-link {
-                padding: 10px 16px;
-                border-left: none;
-                border-bottom: 2px solid transparent;
-            }
-
-            .sidebar-link:hover,
-            .sidebar-link.active {
-                border-left-color: transparent;
-                border-bottom-color: var(--accent);
+            .main-content {
+                margin-left: 220px;
+                padding: 40px 30px;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 60px 24px;
+            .sidebar {
+                display: none;
             }
-
-            header {
-                margin-bottom: 60px;
+            .main-content {
+                margin-left: 0;
+                padding: 30px 20px;
             }
-
             .projects-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
             }
-
-            .project-card {
-                padding: 24px;
+            /* Mobile nav */
+            .mobile-nav {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 30px;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            .mobile-nav a {
+                padding: 8px 16px;
+                background: var(--card-glass);
+                border: 1px solid var(--border-glass);
+                border-radius: 100px;
+                color: var(--muted);
+                text-decoration: none;
+                font-size: 0.8rem;
+                white-space: nowrap;
             }
         }
 
-        /* Smooth scrolling */
-        @media (prefers-reduced-motion: no-preference) {
-            html {
-                scroll-behavior: smooth;
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Gallery</h1>
-        </header>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">Galler<span class="logo-accent">y</span></h1>
+            </div>
 
-        <div class="layout">
-            <!-- Sidebar Navigation -->
-            <aside class="sidebar">
-                <div class="sidebar-title">项目目录</div>
-                <nav>
-                    <ul class="sidebar-nav">
-                        <li class="sidebar-item">
-                            <a href="pages/underwater-3d.html" class="sidebar-link">
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Projects</div>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="pages/underwater-3d.html" class="nav-link">
+                                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
                                 underwater-3d
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="pages/flow-not-rules.html" class="sidebar-link">
+                        <li class="nav-item">
+                            <a href="pages/flow-not-rules.html" class="nav-link">
+                                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
                                 flow-not-rules
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="pages/note-system.html" class="sidebar-link">
+                        <li class="nav-item">
+                            <a href="pages/note-system.html" class="nav-link">
+                                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
                                 note-system
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="pages/flow-philosophy.html" class="sidebar-link">
+                        <li class="nav-item">
+                            <a href="pages/flow-philosophy.html" class="nav-link">
+                                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
                                 flow-philosophy
                             </a>
                         </li>
                     </ul>
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="main-content">
-                <div class="projects-grid">
-                    <!-- Project 1 -->
-                    <a href="pages/underwater-3d.html" class="project-card">
-                        <div class="project-number">01</div>
-                        <h2 class="project-title">Project: underwater-3d</h2>
-                        <div class="project-link">
-                            查看项目
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Project 2 -->
-                    <a href="pages/flow-not-rules.html" class="project-card">
-                        <div class="project-number">02</div>
-                        <h2 class="project-title">Project: flow-not-rules</h2>
-                        <div class="project-link">
-                            查看项目
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Project 3 -->
-                    <a href="pages/note-system.html" class="project-card">
-                        <div class="project-number">03</div>
-                        <h2 class="project-title">Project: note-system</h2>
-                        <div class="project-link">
-                            查看项目
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Project 4 -->
-                    <a href="pages/flow-philosophy.html" class="project-card">
-                        <div class="project-number">04</div>
-                        <h2 class="project-title">Project: flow-philosophy</h2>
-                        <div class="project-link">
-                            查看项目
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Add more project cards here as needed -->
                 </div>
+            </nav>
 
-                <footer>
-                    <p>由 <a href="https://github.com/jeekeagle" target="_blank">@jeekeagle</a> 设计与开发</p>
-                </footer>
-            </main>
-        </div>
+            <div class="sidebar-footer">
+                <a href="https://github.com/jeekeagle" target="_blank">@jeekeagle</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Nav -->
+            <nav class="mobile-nav">
+                <a href="pages/underwater-3d.html">underwater-3d</a>
+                <a href="pages/flow-not-rules.html">flow-not-rules</a>
+                <a href="pages/note-system.html">note-system</a>
+                <a href="pages/flow-philosophy.html">flow-philosophy</a>
+            </nav>
+
+            <header class="page-header">
+                <h1 class="page-title">Gallery</h1>
+                <p class="page-tagline">创意作品集 / 实验性项目</p>
+            </header>
+
+            <div class="projects-grid">
+                <a href="pages/underwater-3d.html" class="project-card">
+                    <div class="card-content">
+                        <div class="card-number">01</div>
+                        <h2 class="card-title">underwater-3d</h2>
+                    </div>
+                    <div class="card-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="pages/flow-not-rules.html" class="project-card">
+                    <div class="card-content">
+                        <div class="card-number">02</div>
+                        <h2 class="card-title">flow-not-rules</h2>
+                    </div>
+                    <div class="card-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="pages/note-system.html" class="project-card">
+                    <div class="card-content">
+                        <div class="card-number">03</div>
+                        <h2 class="card-title">note-system</h2>
+                    </div>
+                    <div class="card-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="pages/flow-philosophy.html" class="project-card">
+                    <div class="card-content">
+                        <div class="card-number">04</div>
+                        <h2 class="card-title">flow-philosophy</h2>
+                    </div>
+                    <div class="card-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                </a>
+            </div>
+
+            <footer class="page-footer">
+                <p>由 <a href="https://github.com/jeekeagle" target="_blank">@jeekeagle</a> 设计与开发</p>
+            </footer>
+        </main>
     </div>
-
-    <script>
-        // Track mouse position for glow effect
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                card.style.setProperty('--mouse-x', `${x}%`);
-                card.style.setProperty('--mouse-y', `${y}%`);
-            });
-        });
-
-        // Smooth reveal on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.project-card').forEach(card => {
-            observer.observe(card);
-        });
-
-        // Highlight active sidebar link based on current page
-        const currentPath = window.location.pathname.split('/').pop();
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (href === currentPath) {
-                link.classList.add('active');
-            }
-        });
-    </script>
 </body>
 </html>
