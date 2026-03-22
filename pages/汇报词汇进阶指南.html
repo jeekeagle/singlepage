@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汇报词汇进阶指南：从"说清楚"到"说到位"</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --accent: #ff6b35;
+            --accent-glow: rgba(255, 107, 53, 0.3);
+            --fg-primary: #f5f5f7;
+            --fg-secondary: #8a8a9a;
+            --slide-transition: 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--fg-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(255, 107, 53, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 107, 53, 0.03) 0%, transparent 70%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        /* Slide Sections */
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity var(--slide-transition), transform var(--slide-transition);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* Typography */
+        .display-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--fg-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--fg-primary);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--fg-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        /* Accent Lines */
+        .accent-line {
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            margin: 2rem 0;
+            border-radius: 2px;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Cards & Boxes */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Framework Diagram */
+        .framework-box {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 53, 0.05) 100%);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent) 0%, transparent 100%);
+        }
+
+        .framework-level {
+            padding: 1.25rem;
+            margin: 1rem 0;
+            background: rgba(255, 107, 53, 0.05);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .framework-level-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .framework-level-desc {
+            font-size: 0.9rem;
+            color: var(--fg-secondary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.1);
+        }
+
+        th {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            color: var(--fg-primary);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 107, 53, 0.03);
+        }
+
+        /* Comparison Boxes */
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .compare-item {
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .compare-old {
+            background: rgba(138, 138, 154, 0.1);
+            border: 1px solid rgba(138, 138, 154, 0.2);
+        }
+
+        .compare-new {
+            background: rgba(255, 107, 53, 0.08);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        .compare-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .compare-old .compare-label {
+            color: var(--fg-secondary);
+        }
+
+        .compare-new .compare-label {
+            color: var(--accent);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.75rem 0;
+            color: var(--fg-primary);
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        /* Highlight Boxes */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .highlight-box.error {
+            background: linear-gradient(135deg, rgba(255, 82, 82, 0.1) 0%, rgba(255, 82, 82, 0.05) 100%);
+            border-left-color: #ff5252;
+        }
+
+        .highlight-box.success {
+            background: linear-gradient(135deg, rgba(105, 255, 135, 0.1) 0%, rgba(105, 255, 135, 0.05) 100%);
+            border-left-color: #69ff87;
+        }
+
+        /* Mnemonic Box */
+        .mnemonic-box {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 107, 53, 0.15);
+        }
+
+        .mnemonic-text {
+            font-size: 1.2rem;
+            line-height: 2;
+            color: var(--fg-primary);
+            font-weight: 500;
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 107, 53, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255, 107, 53, 0.6);
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            border-color: var(--fg-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: scale(1.3);
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+        .stagger-5 { transition-delay: 0.5s; }
+
+        /* Big Number */
+        .big-number {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--accent);
+            opacity: 0.3;
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Quote */
+        .quote {
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--fg-secondary);
+            padding: 2rem;
+            border-left: 4px solid var(--accent);
+            background: var(--bg-secondary);
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            color: var(--fg-secondary);
+            font-size: 0.9rem;
+            padding: 2rem;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 20px;
+            }
+
+            .nav-dots {
+                right: 15px;
+            }
+
+            .comparison-box {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            z-index: 1000;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Section Title Accent */
+        .section-accent {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <main>
+        <!-- Slide 1: Cover -->
+        <section class="slide" data-index="0">
+            <div class="slide-content" style="text-align: center;">
+                <div class="reveal stagger-1">
+                    <span class="section-accent">Professional Communication</span>
+                </div>
+                <h1 class="reveal stagger-1">汇报词汇进阶指南</h1>
+                <div class="accent-line reveal stagger-2" style="margin: 2rem auto;"></div>
+                <p class="subtitle reveal stagger-3">从"说清楚"到"说到位"</p>
+                <p class="reveal stagger-4" style="color: var(--fg-secondary); max-width: 600px; margin: 2rem auto;">
+                    掌握结构化表达的四层级框架，让每一次汇报都展现思维高度与执行深度
+                </p>
+            </div>
+        </section>
+
+        <!-- Slide 2: Pain Points -->
+        <section class="slide" data-index="1">
+            <div class="slide-content">
+                <span class="section-accent reveal">The Problem</span>
+                <h2 class="reveal stagger-1">你有没有过这样的经历？</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <div class="comparison-box reveal stagger-3">
+                    <div class="compare-item compare-old">
+                        <div class="compare-label">❌ 常见困境</div>
+                        <ul>
+                            <li>熬夜一周做出的方案，汇报时领导频频看手机</li>
+                            <li>明明干了三个月的活，PPT讲完对方只问了一句"所以呢"</li>
+                            <li>隔壁组的汇报也没多复杂，但就是听起来"有高度"</li>
+                        </ul>
+                    </div>
+                    <div class="compare-item compare-new">
+                        <div class="compare-label">✅ 核心问题</div>
+                        <p style="font-size: 1.1rem; line-height: 1.8;">
+                            问题往往不在内容本身，而在<strong style="color: var(--accent);">表达的颗粒度</strong>。<br><br>
+                            同样是"我们要加强合作"，有人会说"建立跨部门协同机制"；<br>
+                            同样是"我们做了很多事"，有人会说"构建了全流程服务体系"。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="highlight-box reveal stagger-4">
+                    <p style="font-size: 1.1rem; text-align: center;">
+                        <strong style="color: var(--accent);">后者不是在堆砌词藻</strong>，而是在用<strong>结构化词汇</strong>呈现思维。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Framework Overview -->
+        <section class="slide" data-index="2">
+            <div class="slide-content">
+                <span class="section-accent reveal">Framework</span>
+                <h2 class="reveal stagger-1">四层级词汇框架</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <div class="framework-box reveal stagger-3">
+                    <div class="framework-level">
+                        <div class="framework-level-title">第四层：理论升维层</div>
+                        <div class="framework-level-desc">
+                            <strong>词汇：</strong>范式 · 维度 · 格局 · 视野<br>
+                            <strong style="color: var(--accent);">用途：</strong>体现思维高度，用于创新点提炼、方法论升华、结题总结
+                        </div>
+                    </div>
+
+                    <div class="framework-level">
+                        <div class="framework-level-title">第三层：行动路径层</div>
+                        <div class="framework-level-desc">
+                            <strong>词汇：</strong>路径 · 策略 · 举措 · 抓手 · 载体<br>
+                            <strong style="color: var(--accent);">用途：</strong>回答"怎么做"，用于方案部署、项目推进、问题解决
+                        </div>
+                    </div>
+
+                    <div class="framework-level">
+                        <div class="framework-level-title">第二层：结构支撑层</div>
+                        <div class="framework-level-desc">
+                            <strong>词汇：</strong>模式 · 机制 · 体系 · 框架 · 生态 · 矩阵 · 架构<br>
+                            <strong style="color: var(--accent);">用途：</strong>回答"长什么样"，用于方案架构、系统设计、组织能力展示
+                        </div>
+                    </div>
+
+                    <div class="framework-level">
+                        <div class="framework-level-title">第一层：顶层设计层</div>
+                        <div class="framework-level-desc">
+                            <strong>词汇：</strong>愿景 · 使命 · 蓝图 · 定位 · 导向 · 目标<br>
+                            <strong style="color: var(--accent);">用途：</strong>回答"去哪里"，用于开篇定调、战略规划、年度计划
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box reveal stagger-4">
+                    <p><strong>使用原则：</strong>一份完整的汇报，通常需要<strong>从上到下</strong>覆盖四个层级。层级越高越抽象，层级越低越具体。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Layer 1 - Vision/Mission/Blueprint -->
+        <section class="slide" data-index="3">
+            <div class="slide-content">
+                <span class="section-accent reveal">Layer 1</span>
+                <h2 class="reveal stagger-1">第一层：顶层设计层</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <table class="reveal stagger-3">
+                    <thead>
+                        <tr>
+                            <th>词汇</th>
+                            <th>回答的问题</th>
+                            <th>时间跨度</th>
+                            <th>特征</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>愿景</strong></td>
+                            <td>我们最终想成为什么？</td>
+                            <td>10-20年</td>
+                            <td>感性、理想化、身份认同</td>
+                        </tr>
+                        <tr>
+                            <td><strong>使命</strong></td>
+                            <td>我们存在的根本理由？</td>
+                            <td>永恒</td>
+                            <td>理性、价值导向、责任感</td>
+                        </tr>
+                        <tr>
+                            <td><strong>蓝图</strong></td>
+                            <td>我们怎么规划未来？</td>
+                            <td>3-5年</td>
+                            <td>具象、有时间表、可执行</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="comparison-box reveal stagger-4">
+                    <div class="compare-item compare-old">
+                        <div class="compare-label">普通说法</div>
+                        <p>我们的愿景是营收增长30%</p>
+                    </div>
+                    <div class="compare-item compare-new">
+                        <div class="compare-label">进阶表达</div>
+                        <p>我们的愿景是成为行业数字化转型的引领者，让每一个企业都能享受到智能时代的红利。</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box reveal stagger-5">
+                    <p><strong>高频搭配：</strong>确立愿景 · 绘就蓝图 · 明确定位 · 坚持导向</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Layer 2 - Mode/System/Mechanism -->
+        <section class="slide" data-index="4">
+            <div class="slide-content">
+                <span class="section-accent reveal">Layer 2</span>
+                <h2 class="reveal stagger-1">第二层：结构支撑层</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <table class="reveal stagger-3">
+                    <thead>
+                        <tr>
+                            <th>词汇</th>
+                            <th>侧重点</th>
+                            <th>核心问题</th>
+                            <th>特征</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>模式</strong></td>
+                            <td>样式和结构</td>
+                            <td>是怎么组合的？</td>
+                            <td>可复制、有美感、标准化</td>
+                        </tr>
+                        <tr>
+                            <td><strong>体系</strong></td>
+                            <td>完整性和覆盖面</td>
+                            <td>覆盖全了吗？</td>
+                            <td>系统性、多层次、无死角</td>
+                        </tr>
+                        <tr>
+                            <td><strong>机制</strong></td>
+                            <td>运行动力和逻辑</td>
+                            <td>怎么动起来？</td>
+                            <td>自运转、有激励、有保障</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="comparison-box reveal stagger-4">
+                    <div class="compare-item compare-old">
+                        <div class="compare-label">普通说法</div>
+                        <p>我们让学生上课，也让他们去企业实习。</p>
+                    </div>
+                    <div class="compare-item compare-new">
+                        <div class="compare-label">进阶表达</div>
+                        <p>构建了"通识教育+专业培养+企业实践"三位一体的人才培养<strong>模式</strong>，建立了"业绩与薪酬挂钩"的激励<strong>机制</strong>，形成了全周期的人才培养<strong>体系</strong>。</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box reveal stagger-5">
+                    <p><strong>高频搭配：</strong>构建模式 · 完善体系 · 建立机制 · 优化架构</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Layer 3 - Path/Strategy/Measure -->
+        <section class="slide" data-index="5">
+            <div class="slide-content">
+                <span class="section-accent reveal">Layer 3</span>
+                <h2 class="reveal stagger-1">第三层：行动路径层</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <table class="reveal stagger-3">
+                    <thead>
+                        <tr>
+                            <th>词汇</th>
+                            <th>层级</th>
+                            <th>特征</th>
+                            <th>回答的问题</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>路径</strong></td>
+                            <td>方向性</td>
+                            <td>抽象、战略性</td>
+                            <td>走哪条道？</td>
+                        </tr>
+                        <tr>
+                            <td><strong>策略</strong></td>
+                            <td>方法性</td>
+                            <td>中观、指导性</td>
+                            <td>用什么方法？</td>
+                        </tr>
+                        <tr>
+                            <td><strong>举措</strong></td>
+                            <td>操作性</td>
+                            <td>具体、可执行</td>
+                            <td>做什么动作？</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card reveal stagger-4">
+                    <h3>抓手 vs 载体</h3>
+                    <p><strong>抓手</strong> = 具体的工作着力点（阿基米德的支点）</p>
+                    <p style="color: var(--fg-secondary); margin-top: 0.5rem;">例：以"科普进校园"百场宣讲为核心抓手</p>
+                    <p style="margin-top: 1rem;"><strong>载体</strong> = 承载内容或功能的具体形式</p>
+                    <p style="color: var(--fg-secondary); margin-top: 0.5rem;">例：以在线学习平台为主要载体</p>
+                </div>
+
+                <div class="highlight-box reveal stagger-5">
+                    <p><strong>高频搭配：</strong>探索路径 · 实施策略 · 制定举措 · 以XX为抓手</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Layer 4 - Dimension/Paradigm -->
+        <section class="slide" data-index="6">
+            <div class="slide-content">
+                <span class="section-accent reveal">Layer 4</span>
+                <h2 class="reveal stagger-1">第四层：理论升维层</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <div class="card reveal stagger-3">
+                    <h3>维度 (Dimension)</h3>
+                    <p>看待问题的不同视角或分析框架</p>
+                    <div class="comparison-box" style="margin-top: 1rem;">
+                        <div class="compare-item compare-old" style="padding: 1rem;">
+                            <p>我们不仅研究产品，也研究市场，还研究竞争对手。</p>
+                        </div>
+                        <div class="compare-item compare-new" style="padding: 1rem;">
+                            <p>从产品、市场、竞争、用户<strong>四个维度</strong>，立体化解析行业发展的内在逻辑。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card reveal stagger-4">
+                    <h3>范式 (Paradigm) ⚠️</h3>
+                    <p><strong>最高级的词汇</strong>，底层的思维模型，意味着规则被改写、经验被颠覆</p>
+                    <div class="highlight-box error" style="margin-top: 1rem;">
+                        <p style="font-size: 0.9rem;"><strong>❌ 错误：</strong>我们优化了流程，形成了新范式</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;"><strong>✅ 正确：</strong>从"人工审核"向"AI智能风控"的转变，重塑了内容审核的技术<strong>范式</strong></p>
+                    </div>
+                </div>
+
+                <div class="highlight-box reveal stagger-5">
+                    <p><strong>高频搭配：</strong>多维度分析 · 确立新范式 · 范式变革</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Quick Reference -->
+        <section class="slide" data-index="7">
+            <div class="slide-content">
+                <span class="section-accent reveal">Quick Reference</span>
+                <h2 class="reveal stagger-1">词汇搭配速查表</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <table class="reveal stagger-3" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>核心词</th>
+                            <th>常搭配动词</th>
+                            <th>常搭配形容词</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>愿景</strong></td>
+                            <td>确立、描绘、践行</td>
+                            <td>宏伟、清晰、美好</td>
+                        </tr>
+                        <tr>
+                            <td><strong>蓝图</strong></td>
+                            <td>绘就、规划、描绘</td>
+                            <td>宏伟、清晰、可行</td>
+                        </tr>
+                        <tr>
+                            <td><strong>模式</strong></td>
+                            <td>构建、创新、推广</td>
+                            <td>成熟、可复制、创新</td>
+                        </tr>
+                        <tr>
+                            <td><strong>机制</strong></td>
+                            <td>建立、完善、健全</td>
+                            <td>长效、灵活、闭环</td>
+                        </tr>
+                        <tr>
+                            <td><strong>体系</strong></td>
+                            <td>构建、完善、健全</td>
+                            <td>完整、系统、多层次</td>
+                        </tr>
+                        <tr>
+                            <td><strong>路径</strong></td>
+                            <td>探索、开辟、明确</td>
+                            <td>清晰、多元、创新</td>
+                        </tr>
+                        <tr>
+                            <td><strong>策略</strong></td>
+                            <td>制定、实施、调整</td>
+                            <td>有效、灵活、组合</td>
+                        </tr>
+                        <tr>
+                            <td><strong>举措</strong></td>
+                            <td>制定、推出、落实</td>
+                            <td>有力、务实、具体</td>
+                        </tr>
+                        <tr>
+                            <td><strong>抓手</strong></td>
+                            <td>找准、用好、强化</td>
+                            <td>有力、明确、具体</td>
+                        </tr>
+                        <tr>
+                            <td><strong>范式</strong></td>
+                            <td>确立、转变、创新</td>
+                            <td>新的、根本性</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box reveal stagger-4">
+                    <p><strong>场景选词指南：</strong></p>
+                    <p>战略规划开篇 → 愿景+使命+蓝图</p>
+                    <p>方案架构展示 → 模式+体系+机制</p>
+                    <p>工作部署推进 → 路径+策略+举措</p>
+                    <p>项目总结提炼 → 抓手+载体+范式</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Common Mistakes -->
+        <section class="slide" data-index="8">
+            <div class="slide-content">
+                <span class="section-accent reveal">Avoid These</span>
+                <h2 class="reveal stagger-1">六大常见错误</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <div class="card reveal stagger-3">
+                    <h3>❌ 错误一：词汇堆砌</h3>
+                    <p style="color: var(--fg-secondary); margin: 0.5rem 0;">我们要建立完善的机制，构建科学的体系，形成创新的模式...</p>
+                    <div class="highlight-box success" style="margin-top: 0.5rem;">
+                        <p><strong>✅ 避坑：</strong>每个高级词汇后必须有具体内容支撑</p>
+                    </div>
+                </div>
+
+                <div class="card reveal stagger-4">
+                    <h3>❌ 错误二：层级错位</h3>
+                    <p style="color: var(--fg-secondary); margin: 0.5rem 0;">优化会议室预约流程，开创了办公管理新范式</p>
+                    <div class="highlight-box success" style="margin-top: 0.5rem;">
+                        <p><strong>✅ 避坑：</strong>范式仅用于根本性变革，日常优化不要用</p>
+                    </div>
+                </div>
+
+                <div class="card reveal stagger-5">
+                    <h3>❌ 错误四：抓手抽象</h3>
+                    <p style="color: var(--fg-secondary); margin: 0.5rem 0;">要以创新为抓手，推动高质量发展</p>
+                    <div class="highlight-box success" style="margin-top: 0.5rem;">
+                        <p><strong>✅ 避坑：</strong>抓手必须是具体项目/行动，不能是抽象概念</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Practice Example -->
+        <section class="slide" data-index="9">
+            <div class="slide-content">
+                <span class="section-accent reveal">Practice</span>
+                <h2 class="reveal stagger-1">实战演练：汇报升级</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <div class="highlight-box reveal stagger-3" style="background: rgba(138, 138, 154, 0.1); border-left-color: var(--fg-secondary);">
+                    <p style="font-size: 0.95rem;"><strong>原始版本（大白话）：</strong></p>
+                    <p style="margin-top: 0.5rem;">我们部门今年做了不少事。主要是推广科普知识，让更多人了解科学。具体来说，我们去学校讲课，也在网上发视频。大家配合得挺好，效果也不错。以后我们还会继续做下去，做得更好。</p>
+                </div>
+
+                <div class="highlight-box reveal stagger-4">
+                    <p style="font-size: 0.95rem;"><strong>升级版本：</strong></p>
+                    <p style="margin-top: 0.5rem; line-height: 2;">
+                        <strong style="color: var(--accent);">（顶层设计）</strong> 为响应"科教兴国"战略，我们确立了"让科学意识深入人心"的<strong>愿景</strong>。<br><br>
+                        <strong style="color: var(--accent);">（结构支撑）</strong> 构建了"线上新媒体+线下沉浸式体验"的双驱科普<strong>模式</strong>，建立了专家联动的协同<strong>机制</strong>。<br><br>
+                        <strong style="color: var(--accent);">（行动路径）</strong> 以"科普进校园"百场宣讲为核心<strong>抓手</strong>，探索数字化科普新<strong>路径</strong>。全年开展活动120场，触达50万人次。<br><br>
+                        <strong style="color: var(--accent);">（理论升维）</strong> 拓宽了服务社会的<strong>维度</strong>，确立了"寓教于乐、科教融合"的科普传播新<strong>范式</strong>。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Summary -->
+        <section class="slide" data-index="10">
+            <div class="slide-content">
+                <span class="section-accent reveal">Summary</span>
+                <h2 class="reveal stagger-1">核心心法</h2>
+                <div class="accent-line reveal stagger-2"></div>
+
+                <div class="mnemonic-box reveal stagger-3">
+                    <div class="mnemonic-text">
+                        定方向，用愿景蓝图<br>
+                        展架构，用模式机制体系<br>
+                        说行动，用路径策略举措抓手<br>
+                        提高度，用维度范式
+                    </div>
+                </div>
+
+                <div class="quote reveal stagger-4">
+                    词汇升级的本质，是思维升级。这些词汇不是职场黑话，而是结构化思维的自然流露。
+                </div>
+
+                <div class="highlight-box reveal stagger-5">
+                    <p><strong>速记口诀：</strong></p>
+                    <p style="margin-top: 0.5rem; text-align: center; font-size: 1.1rem;">
+                        词汇是思维的脚手架<br>
+                        不是用高级词汇包装空洞内容<br>
+                        而是用精准词汇呈现深入思考
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: End -->
+        <section class="slide" data-index="11">
+            <div class="slide-content" style="text-align: center;">
+                <h1 class="reveal stagger-1" style="font-size: clamp(3rem, 8vw, 6rem);">谢谢观看</h1>
+                <div class="accent-line reveal stagger-2" style="margin: 2rem auto;"></div>
+                <p class="subtitle reveal stagger-3">从"说清楚"到"说到位"</p>
+                <p class="reveal stagger-4" style="color: var(--fg-secondary); margin-top: 2rem;">
+                    让每一次汇报都展现思维高度与执行深度
+                </p>
+                <div class="footer-note reveal stagger-5">
+                    使用滚动或点击导航点切换页面<br>
+                    <span style="font-size: 0.8rem; opacity: 0.5;">Scroll or click navigation dots to navigate</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Slide Navigation
+        const slides = document.querySelectorAll('.slide');
+        const navDotsContainer = document.getElementById('navDots');
+        const progressBar = document.getElementById('progressBar');
+
+        // Create navigation dots
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('div');
+            dot.className = 'nav-dot';
+            dot.dataset.index = index;
+            dot.addEventListener('click', () => goToSlide(index));
+            navDotsContainer.appendChild(dot);
+        });
+
+        const navDots = document.querySelectorAll('.nav-dot');
+        let currentSlide = 0;
+        let isScrolling = false;
+
+        function updateSlides() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+
+            navDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Trigger reveal animations for current slide
+            const currentSlideEl = slides[currentSlide];
+            const reveals = currentSlideEl.querySelectorAll('.reveal');
+            reveals.forEach(el => el.classList.add('active'));
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < slides.length) {
+                currentSlide = index;
+                slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+                updateSlides();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        // Scroll-based navigation
+        window.addEventListener('wheel', (e) => {
+            if (isScrolling) return;
+
+            if (e.deltaY > 50) {
+                nextSlide();
+                isScrolling = true;
+                setTimeout(() => isScrolling = false, 1000);
+            } else if (e.deltaY < -50) {
+                prevSlide();
+                isScrolling = true;
+                setTimeout(() => isScrolling = false, 1000);
+            }
+        }, { passive: true });
+
+        // Keyboard navigation
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Touch navigation
+        let touchStartY = 0;
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        window.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].clientY;
+            const diff = touchStartY - touchEndY;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        });
+
+        // Intersection Observer for slide detection
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.classList.contains('slide')) {
+                    const index = parseInt(entry.target.dataset.index);
+                    if (index !== currentSlide) {
+                        currentSlide = index;
+                        updateSlides();
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        slides.forEach(slide => observer.observe(slide));
+
+        // Initialize
+        updateSlides();
+
+        // Reveal animations on load
+        setTimeout(() => {
+            slides[0].querySelectorAll('.reveal').forEach(el => {
+                el.classList.add('active');
+            });
+        }, 300);
+    </script>
+</body>
+</html>
