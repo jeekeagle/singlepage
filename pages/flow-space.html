@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>留白的艺术 | The Art of Empty Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* === RESET & BASE === */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Colors - Space Theme */
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --fg-primary: #f5f5f7;
+      --fg-secondary: #8a8a9a;
+      --accent: #ff6b35;
+      --accent-secondary: #4ecdc4;
+      --accent-soft: rgba(255, 107, 53, 0.15);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+
+      /* Typography */
+      --font-display: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+      --font-body: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+
+      /* Spacing */
+      --space-xs: clamp(0.5rem, 1vw, 0.75rem);
+      --space-sm: clamp(0.75rem, 1.5vw, 1rem);
+      --space-md: clamp(1rem, 2vw, 1.5rem);
+      --space-lg: clamp(1.5rem, 3vw, 2.5rem);
+      --space-xl: clamp(2rem, 5vw, 4rem);
+      --space-2xl: clamp(3rem, 8vw, 6rem);
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--fg-primary);
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    /* === SLIDE CONTAINER === */
+    .presentation {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* === SLIDE BASE === */
+    .slide {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: var(--space-lg);
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .slide-content {
+      max-width: clamp(280px, 80vw, 900px);
+      width: 100%;
+      text-align: center;
+    }
+
+    /* === TYPOGRAPHY === */
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+
+    h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 5vw, 3rem);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--space-lg);
+    }
+
+    h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-weight: 500;
+      margin-bottom: var(--space-sm);
+    }
+
+    p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--fg-secondary);
+      max-width: 60ch;
+      margin: 0 auto;
+    }
+
+    .subtitle {
+      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+      font-weight: 300;
+      color: var(--fg-secondary);
+    }
+
+    /* === ACCENT ELEMENTS === */
+    .accent {
+      color: var(--accent);
+    }
+
+    .accent-cyan {
+      color: var(--accent-secondary);
+    }
+
+    .accent-line {
+      width: clamp(60px, 10vw, 120px);
+      height: 3px;
+      background: var(--accent);
+      margin: var(--space-lg) auto;
+    }
+
+    /* === CARDS === */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: clamp(12px, 2vw, 20px);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      backdrop-filter: blur(10px);
+      text-align: left;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+      width: 100%;
+      max-width: clamp(600px, 80vw, 900px);
+    }
+
+    /* === BIG NUMBER === */
+    .big-number {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 15vw, 10rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      opacity: 0.3;
+    }
+
+    /* === QUOTE === */
+    .quote {
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--fg-primary);
+      position: relative;
+      padding: var(--space-lg);
+    }
+
+    .quote::before {
+      content: '"';
+      font-size: clamp(3rem, 8vw, 6rem);
+      color: var(--accent);
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.5;
+      line-height: 1;
+    }
+
+    /* === EMPHASIS BOX === */
+    .emphasis-box {
+      background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(78, 205, 196, 0.1) 100%);
+      border-left: 4px solid var(--accent);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+      text-align: left;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .emphasis-box p {
+      color: var(--fg-primary);
+      font-weight: 500;
+      margin: 0;
+    }
+
+    /* === THREE COLUMNS === */
+    .three-columns {
+      display: flex;
+      gap: var(--space-md);
+      width: 100%;
+      max-width: clamp(600px, 85vw, 1000px);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 180px;
+      max-width: 280px;
+      text-align: center;
+    }
+
+    .column-icon {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: var(--space-sm);
+      opacity: 0.8;
+    }
+
+    .column h4 {
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      margin-bottom: var(--space-xs);
+      color: var(--accent);
+    }
+
+    .column p {
+      font-size: clamp(0.875rem, 1.5vw, 1rem);
+    }
+
+    /* === LIST STYLE === */
+    .insight-list {
+      list-style: none;
+      text-align: left;
+      margin-top: var(--space-md);
+    }
+
+    .insight-list li {
+      padding: var(--space-sm) 0;
+      padding-left: var(--space-lg);
+      position: relative;
+      color: var(--fg-secondary);
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    }
+
+    .insight-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* === NAVIGATION === */
+    .nav-dots {
+      position: fixed;
+      bottom: var(--space-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: var(--space-sm);
+      z-index: 100;
+    }
+
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .nav-dot:hover,
+    .nav-dot.active {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
+
+    .nav-hint {
+      position: fixed;
+      bottom: var(--space-xl);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+      color: var(--fg-secondary);
+      opacity: 0.5;
+    }
+
+    /* === ANIMATIONS === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .slide.active .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
+
+    /* === SLIDE SPECIFIC STYLES === */
+
+    /* Slide 1: Title */
+    .slide-title {
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(78, 205, 196, 0.05) 0%, transparent 40%),
+        var(--bg-primary);
+    }
+
+    /* Slide 2: Core Insight */
+    .slide-core {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 107, 53, 0.1) 0%, transparent 60%),
+        var(--bg-secondary);
+    }
+
+    /* Slide 3: Body */
+    .slide-body {
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(255, 107, 53, 0.06) 0%, transparent 40%),
+        var(--bg-primary);
+    }
+
+    /* Slide 4: Mind */
+    .slide-mind {
+      background: var(--bg-secondary);
+    }
+
+    /* Slide 5: Strategy */
+    .slide-strategy {
+      background:
+        linear-gradient(135deg, rgba(78, 205, 196, 0.05) 0%, transparent 50%),
+        var(--bg-primary);
+    }
+
+    /* Slide 6: Efficiency */
+    .slide-efficiency {
+      background: var(--bg-secondary);
+    }
+
+    /* Slide 7: Ending */
+    .slide-ending {
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 107, 53, 0.12) 0%, transparent 50%),
+        var(--bg-primary);
+    }
+
+    /* === REDUCED MOTION === */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+
+      .slide {
+        transition: opacity 0.3s ease;
+      }
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 600px) {
+      .three-columns {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .column {
+        width: 100%;
+        max-width: 280px;
+      }
+    }
+
+    @media (max-height: 600px) {
+      .slide {
+        padding: var(--space-md);
+      }
+
+      h1 {
+        font-size: clamp(1.75rem, 6vw, 3rem);
+      }
+
+      h2 {
+        font-size: clamp(1.25rem, 4vw, 2rem);
+      }
+
+      .big-number {
+        font-size: clamp(2.5rem, 10vw, 5rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="presentation">
+    <!-- === SLIDE 1: TITLE === -->
+    <section class="slide slide-title active" data-slide="1">
+      <div class="slide-content">
+        <p class="subtitle reveal">The Art of Empty Space</p>
+        <h1 class="reveal reveal-delay-1">
+          为什么高手都要<br>给自己留点<span class="accent">"空"</span>？
+        </h1>
+        <div class="accent-line reveal reveal-delay-2"></div>
+        <p class="reveal reveal-delay-3">
+          有个反直觉的现象：<br>
+          很多人午餐时间明明很赶，却偏偏不把饭盒装满
+        </p>
+      </div>
+    </section>
+
+    <!-- === SLIDE 2: CORE INSIGHT === -->
+    <section class="slide slide-core" data-slide="2">
+      <div class="slide-content">
+        <div class="big-number reveal">空</div>
+        <h2 class="reveal reveal-delay-1">不是浪费</h2>
+        <div class="emphasis-box reveal reveal-delay-2">
+          <p>"空"是未被行使的选择权</p>
+        </div>
+        <p class="reveal reveal-delay-3">
+          这不是克制，是策略
+        </p>
+      </div>
+    </section>
+
+    <!-- === SLIDE 3: BODY - REDUNDANCY === -->
+    <section class="slide slide-body" data-slide="3">
+      <div class="slide-content">
+        <div class="big-number reveal">01</div>
+        <h2 class="reveal reveal-delay-1">空腹：<span class="accent">身体层面的冗余</span></h2>
+        <p class="reveal reveal-delay-2">
+          吃到七八分饱是最高效的状态
+        </p>
+        <div class="accent-line reveal reveal-delay-3"></div>
+        <div class="card-grid reveal reveal-delay-4">
+          <div class="card">
+            <h3>血液分配</h3>
+            <p>吃太撑，血液全跑去消化，大脑供血不足</p>
+          </div>
+          <div class="card">
+            <h3>响应能力</h3>
+            <p>突发状况出现时，撑饱的胃让你动弹不得</p>
+          </div>
+        </div>
+        <p class="reveal reveal-delay-5" style="margin-top: var(--space-md); font-size: clamp(0.9rem, 1.5vw, 1rem);">
+          用系统论的话说，这叫<span class="accent">冗余</span><br>
+          用金融的话说，这叫<span class="accent">流动性</span><br>
+          用人生的话说，这叫<span class="accent">自由</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- === SLIDE 4: MIND - OVERFITTING === -->
+    <section class="slide slide-mind" data-slide="4">
+      <div class="slide-content">
+        <div class="big-number reveal">02</div>
+        <h2 class="reveal reveal-delay-1">空脑：<span class="accent">认知层面的过拟合</span></h2>
+        <div class="quote reveal reveal-delay-2">
+          大脑不是硬盘，容量满了不是存不进去，而是无法运转
+        </div>
+        <p class="reveal reveal-delay-3">
+          机器学习中有个概念：一个模型如果在训练数据上表现太好，<br>
+          往往会在真实场景中表现很差——<br>
+          因为它把<span class="accent">噪音也当成规律</span>学进去了
+        </p>
+        <div class="emphasis-box reveal reveal-delay-4">
+          <p>手里是空的，你才能拿起新武器；脑子是空的，你才能跑通新逻辑。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- === SLIDE 5: STRATEGY - ANTIFRAGILE === -->
+    <section class="slide slide-strategy" data-slide="5">
+      <div class="slide-content">
+        <div class="big-number reveal">03</div>
+        <h2 class="reveal reveal-delay-1">空仓：<span class="accent">策略层面的反脆弱</span></h2>
+        <p class="reveal reveal-delay-2">
+          塔勒布在《反脆弱》中讲过一个经典故事：<br>
+          银行高管 vs 出租车司机
+        </p>
+        <div class="three-columns reveal reveal-delay-3">
+          <div class="column">
+            <div class="column-icon">👔</div>
+            <h4>哥哥：银行高管</h4>
+            <p>收入稳定，但系统高度依赖<br>一旦裁员，难以迁移</p>
+          </div>
+          <div class="column">
+            <div class="column-icon">🚕</div>
+            <h4>弟弟：出租车司机</h4>
+            <p>收入起伏，但每天都在<br>应对不确定性</p>
+          </div>
+          <div class="column">
+            <div class="column-icon">💪</div>
+            <h4>谁更抗跌？</h4>
+            <p>看似不稳定的系统<br>面对冲击时反而更强</p>
+          </div>
+        </div>
+        <div class="accent-line reveal reveal-delay-4"></div>
+        <p class="reveal reveal-delay-5">
+          <span class="accent">满</span>，意味着确定，也意味着终结<br>
+          <span class="accent-cyan">空</span>，意味着不确定，但也意味着自由
+        </p>
+      </div>
+    </section>
+
+    <!-- === SLIDE 6: EFFICIENCY === -->
+    <section class="slide slide-efficiency" data-slide="6">
+      <div class="slide-content">
+        <div class="big-number reveal">04</div>
+        <h2 class="reveal reveal-delay-1">效率是一种<span class="accent">脆弱游戏</span></h2>
+        <p class="reveal reveal-delay-2">
+          效率的本质是什么？<br>
+          是<span class="accent">没有浪费</span>
+        </p>
+        <div class="accent-line reveal reveal-delay-3"></div>
+        <p class="reveal reveal-delay-4">
+          没有浪费，意味着<span class="accent">没有余量</span>
+        </p>
+        <ul class="insight-list reveal reveal-delay-5">
+          <li>丰田的 Just-in-Time 生产模式，正常时效率惊人，疫情一来瞬间瘫痪</li>
+          <li>你把日程排得滴水不漏，一个突发状况就能让你崩溃</li>
+          <li>你把技能练得极度专精，行业一变，你就被淘汰</li>
+        </ul>
+        <div class="emphasis-box reveal reveal-delay-6">
+          <p>效率是顺境的武器，冗余是逆境的护盾。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- === SLIDE 7: ENDING === -->
+    <section class="slide slide-ending" data-slide="7">
+      <div class="slide-content">
+        <h2 class="reveal">留白的<span class="accent">艺术</span></h2>
+        <div class="accent-line reveal reveal-delay-1"></div>
+        <p class="reveal reveal-delay-2">
+          所以高手们都在做减法
+        </p>
+        <ul class="insight-list reveal reveal-delay-3">
+          <li><strong>乔布斯</strong>每天穿同样的衣服，不想把决策力浪费在"今天穿什么"</li>
+          <li><strong>巴菲特</strong>大部分时间都在办公室里"发呆"，需要空间来思考</li>
+          <li><strong>顶级运动员</strong>比赛前减少社交，给身体和心智留出恢复的余地</li>
+        </ul>
+        <div class="quote reveal reveal-delay-4" style="margin-top: var(--space-lg);">
+          只有空着，才能装下真正重要的东西
+        </div>
+        <p class="reveal reveal-delay-5" style="margin-top: var(--space-lg); font-size: clamp(0.875rem, 1.5vw, 1rem);">
+          既然要赶路，就别把背包塞得太满
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- === NAVIGATION === -->
+  <nav class="nav-dots">
+    <button class="nav-dot active" data-slide="1" aria-label="Slide 1"></button>
+    <button class="nav-dot" data-slide="2" aria-label="Slide 2"></button>
+    <button class="nav-dot" data-slide="3" aria-label="Slide 3"></button>
+    <button class="nav-dot" data-slide="4" aria-label="Slide 4"></button>
+    <button class="nav-dot" data-slide="5" aria-label="Slide 5"></button>
+    <button class="nav-dot" data-slide="6" aria-label="Slide 6"></button>
+    <button class="nav-dot" data-slide="7" aria-label="Slide 7"></button>
+  </nav>
+  <p class="nav-hint">← → 空格 点击导航</p>
+
+  <script>
+    // === SLIDE NAVIGATION ===
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.nav-dot');
+    let currentSlide = 1;
+    const totalSlides = slides.length;
+
+    function goToSlide(num) {
+      if (num < 1) num = 1;
+      if (num > totalSlides) num = totalSlides;
+
+      slides.forEach(slide => slide.classList.remove('active'));
+      dots.forEach(dot => dot.classList.remove('active'));
+
+      document.querySelector(`[data-slide="${num}"]`).classList.add('active');
+      document.querySelector(`.nav-dot[data-slide="${num}"]`).classList.add('active');
+
+      currentSlide = num;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        goToSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        goToSlide(currentSlide - 1);
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      }
+    });
+
+    // Click navigation
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        goToSlide(parseInt(dot.dataset.slide));
+      });
+    });
+
+    // Touch/Swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const threshold = 50;
+      const diff = touchStartX - touchEndX;
+
+      if (Math.abs(diff) > threshold) {
+        if (diff > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }
+    }
+
+    // Mouse wheel navigation
+    let wheelTimeout;
+    document.addEventListener('wheel', (e) => {
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        if (e.deltaY > 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }, 50);
+    }, { passive: true });
+  </script>
+</body>
+</html>
