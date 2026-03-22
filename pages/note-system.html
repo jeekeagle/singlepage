@@ -3,367 +3,320 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Note System — Liteseed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    .card {
-      width: 900px;
-      background: #f5f3ed;
-      padding: 50px 50px 40px;
-      position: relative;
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --fg-primary: #f5f5f7;
+      --fg-secondary: #8a8a9a;
+      --accent: #ff6b35;
+      --accent-soft: rgba(255, 107, 53, 0.15);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --font-display: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+      --font-body: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--fg-primary);
+      line-height: 1.6;
       overflow: hidden;
     }
-    
-    .card::before {
-      content: '';
+
+    .presentation {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slide {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(1.5rem, 5vw, 4rem);
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      opacity: 0.04;
-      pointer-events: none;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
     }
-    
-    .meta-bar {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 35px;
-      position: relative;
-      z-index: 1;
+
+    .slide.active { opacity: 1; visibility: visible; }
+
+    .slide-content {
+      max-width: clamp(280px, 80vw, 900px);
+      width: 100%;
+      text-align: center;
     }
-    
-    .tag {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 8vw, 5rem);
       font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #666;
-      background: rgba(0,0,0,0.06);
-      padding: 6px 14px;
-      border-radius: 2px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: clamp(1rem, 2vw, 1.5rem);
     }
-    
-    .date {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: #888;
-      letter-spacing: 0.02em;
-    }
-    
-    .main-title {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 68px;
-      font-weight: 900;
-      line-height: 1.05;
-      color: #0a0a0a;
-      margin-bottom: 12px;
-      letter-spacing: -0.03em;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .subtitle {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: 20px;
-      color: #444;
-      line-height: 1.5;
-      margin-bottom: 35px;
-      position: relative;
-      z-index: 1;
-      max-width: 680px;
-    }
-    
-    .accent-bar {
-      height: 5px;
-      background: #1a1a1a;
-      width: 80px;
-      margin-bottom: 40px;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .section-label {
-      font-family: 'Oswald', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 18px;
-    }
-    
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 35px;
-      position: relative;
-      z-index: 1;
-      margin-bottom: 35px;
-    }
-    
-    .folder-box {
-      background: rgba(0,0,0,0.03);
-      border-left: 4px solid #1a1a1a;
-      padding: 20px 18px;
-      position: relative;
-    }
-    
-    .folder-box.highlight {
-      border-left-color: #e63946;
-      background: rgba(230,57,70,0.05);
-    }
-    
-    .folder-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 6px;
-      letter-spacing: 0.02em;
-    }
-    
-    .folder-desc {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: 15px;
-      color: #555;
-      line-height: 1.5;
-    }
-    
-    .folder-role {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      color: #888;
-      margin-top: 8px;
-      font-weight: 500;
-    }
-    
-    .comparison-box {
-      background: rgba(0,0,0,0.03);
-      padding: 22px 20px;
-      border-radius: 2px;
-    }
-    
-    .comparison-title {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 12px;
-    }
-    
-    .comparison-text {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: 15px;
-      color: #555;
-      line-height: 1.6;
-    }
-    
-    .comparison-text del {
-      color: #aaa;
-      text-decoration: line-through;
-    }
-    
-    .highlight-text {
-      color: #e63946;
+
+    h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 5vw, 3rem);
       font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: clamp(1rem, 2vw, 1.5rem);
     }
-    
-    .ai-section {
-      background: #1a1a1a;
-      padding: 28px 25px;
-      position: relative;
-      z-index: 1;
-      margin-bottom: 35px;
+
+    h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-weight: 500;
+      margin-bottom: 0.75rem;
     }
-    
-    .ai-section .section-label {
-      color: #666;
-      margin-bottom: 15px;
+
+    p { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--fg-secondary); max-width: 60ch; margin: 0 auto; }
+    .subtitle { font-size: clamp(1.125rem, 2.5vw, 1.5rem); font-weight: 300; color: var(--fg-secondary); }
+    .accent { color: var(--accent); }
+    .accent-line { width: clamp(60px, 10vw, 120px); height: 3px; background: var(--accent); margin: clamp(1rem, 2vw, 1.5rem) auto; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: clamp(12px, 2vw, 20px);
+      padding: clamp(1rem, 2vw, 1.5rem);
+      margin-bottom: 1rem;
+      backdrop-filter: blur(10px);
+      text-align: left;
     }
-    
-    .ai-title {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 18px;
-      line-height: 1.3;
-    }
-    
-    .ai-grid {
+
+    .card-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: clamp(1rem, 2vw, 1.5rem);
+      width: 100%;
+      max-width: clamp(600px, 80vw, 900px);
     }
-    
-    .ai-item {
-      border-left: 3px solid #e63946;
-      padding-left: 14px;
-    }
-    
-    .ai-item-title {
-      font-family: 'Oswald', sans-serif;
-      font-size: 14px;
-      color: #fff;
-      margin-bottom: 6px;
-      letter-spacing: 0.05em;
-    }
-    
-    .ai-item-desc {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: 13px;
-      color: #999;
-      line-height: 1.5;
-    }
-    
-    .quote-box {
-      border-top: 3px solid #1a1a1a;
-      padding-top: 25px;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .quote-text {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 22px;
-      color: #1a1a1a;
-      line-height: 1.6;
+
+    .big-number {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 15vw, 10rem);
       font-weight: 700;
-      margin-bottom: 10px;
+      color: var(--accent);
+      line-height: 1;
+      opacity: 0.3;
     }
-    
-    .quote-source {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      color: #888;
-    }
-    
-    .footer {
+
+    .highlight-card { border-color: rgba(255, 107, 53, 0.3); background: var(--accent-soft); }
+
+    .nav-dots {
+      position: fixed;
+      bottom: clamp(1rem, 2vw, 2rem);
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(0,0,0,0.1);
-      position: relative;
-      z-index: 1;
+      gap: clamp(0.5rem, 1vw, 1rem);
+      z-index: 100;
     }
-    
-    .footer-left {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      color: #aaa;
-      letter-spacing: 0.05em;
+
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
     }
-    
-    .divider {
-      height: 1px;
-      background: rgba(0,0,0,0.08);
-      margin: 30px 0;
+
+    .nav-dot:hover, .nav-dot.active { background: var(--accent); transform: scale(1.2); }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .slide.active .reveal { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    .slide-title { background: radial-gradient(ellipse at 30% 20%, rgba(255, 107, 53, 0.08) 0%, transparent 50%), var(--bg-primary); }
+    .slide-content-bg { background: var(--bg-secondary); }
+    .slide-quote { background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, transparent 50%), var(--bg-primary); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .slide { transition: opacity 0.3s ease; }
+    }
+
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="meta-bar">
-      <span class="tag">Knowledge Management</span>
-      <span class="date">21 Mar, 2026</span>
-    </div>
-    
-    <h1 class="main-title">放弃秩序<br>拥抱 AI</h1>
-    
-    <p class="subtitle">Liteseed 笔记法：用五个文件夹终结分类焦虑，让 Claude 成为你的第二大脑管家</p>
-    
-    <div class="accent-bar"></div>
-    
-    <div class="section-label">Five Folders Architecture</div>
-    
-    <div class="grid-2">
-      <div class="folder-box highlight">
-        <div class="folder-name">Inbox</div>
-        <div class="folder-desc">纯粹的捕获区。随机想法、网页剪藏、语音备忘录全部倾倒于此</div>
-        <div class="folder-role">零分类压力 → AI 自动处理</div>
+  <div class="presentation">
+    <!-- Slide 1: Title -->
+    <section class="slide slide-title active" data-slide="1">
+      <div class="slide-content">
+        <p class="subtitle reveal">Knowledge Management</p>
+        <h1 class="reveal reveal-delay-1">
+          <span class="accent">放弃秩序</span><br>拥抱 AI
+        </h1>
+        <div class="accent-line reveal reveal-delay-2"></div>
+        <p class="reveal reveal-delay-3">
+          Liteseed 笔记法：用五个文件夹终结分类焦虑<br>
+          让 Claude 成为你的第二大脑管家
+        </p>
       </div>
-      
-      <div class="folder-box highlight">
-        <div class="folder-name">Notes</div>
-        <div class="folder-desc">系统的绝对核心。无子文件夹的扁平目录，所有笔记的唯一安息地</div>
-        <div class="folder-role">900 或 9000 文件，同一层级</div>
-      </div>
-      
-      <div class="folder-box">
-        <div class="folder-name">Categories</div>
-        <div class="folder-desc">导航层。容器笔记，动态展示 Notes 中的文件</div>
-        <div class="folder-role">回答「这是什么类型的笔记」</div>
-      </div>
-      
-      <div class="folder-box">
-        <div class="folder-name">Subjects</div>
-        <div class="folder-desc">第二导航层。串联跨越类别的核心主题线索</div>
-        <div class="folder-role">回答「这是关于什么的」</div>
-      </div>
-    </div>
-    
-    <div class="folder-box" style="max-width: 300px">
-      <div class="folder-name">System</div>
-      <div class="folder-desc">基础设施区：模板、附件、仪表盘</div>
-      <div class="folder-role">维护系统所需的一切</div>
-    </div>
-    
-    <div class="divider"></div>
-    
-    <div class="grid-2">
-      <div class="comparison-box">
-        <div class="comparison-title">❌ 传统思维陷阱</div>
-        <div class="comparison-text">
-          每次创建笔记，都要缴纳「隐性税负」：<del>这是项目还是资源？属于哪个领域？放在哪个子文件夹？</del><br><br>
-          检索时还要缴纳第二重税：不仅要记住写了什么，还要记住藏在哪里。
+    </section>
+
+    <!-- Slide 2: Five Folders -->
+    <section class="slide slide-content-bg" data-slide="2">
+      <div class="slide-content">
+        <div class="big-number reveal">01</div>
+        <h2 class="reveal reveal-delay-1">Five Folders <span class="accent">Architecture</span></h2>
+        <div class="card-grid reveal reveal-delay-2">
+          <div class="card highlight-card">
+            <h3>Inbox</h3>
+            <p>纯粹的捕获区。随机想法、网页剪藏、语音备忘录全部倾倒于此</p>
+          </div>
+          <div class="card highlight-card">
+            <h3>Notes</h3>
+            <p>系统的绝对核心。无子文件夹的扁平目录，所有笔记的唯一安息地</p>
+          </div>
+          <div class="card">
+            <h3>Categories</h3>
+            <p>导航层。容器笔记，动态展示 Notes 中的文件</p>
+          </div>
+          <div class="card">
+            <h3>Subjects</h3>
+            <p>第二导航层。串联跨越类别的核心主题线索</p>
+          </div>
         </div>
       </div>
-      
-      <div class="comparison-box">
-        <div class="comparison-title">✓ Liteseed 范式转变</div>
-        <div class="comparison-text">
-          <span class="highlight-text">停止思考「笔记应该放在哪里」，开始追问「这条笔记是什么」</span><br><br>
-          笔记不属于某个物理位置。你描述它，系统找到它；有了 AI，连描述都被自动化了。
+    </section>
+
+    <!-- Slide 3: Paradigm Shift -->
+    <section class="slide slide-quote" data-slide="3">
+      <div class="slide-content">
+        <div class="big-number reveal">02</div>
+        <h2 class="reveal reveal-delay-1">范式 <span class="accent">转变</span></h2>
+        <div class="card-grid reveal reveal-delay-2">
+          <div class="card" style="background: rgba(255, 100, 100, 0.08); border-color: rgba(255, 100, 100, 0.2);">
+            <h3 style="color: #ff6464;">❌ 传统思维陷阱</h3>
+            <p>每次创建笔记，都要缴纳「隐性税负」：这是项目还是资源？属于哪个领域？放在哪个子文件夹？</p>
+          </div>
+          <div class="card highlight-card">
+            <h3 class="accent">→ Liteseed 范式</h3>
+            <p><strong>停止思考「笔记应该放在哪里」，开始追问「这条笔记是什么」</strong></p>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div class="ai-section">
-      <div class="section-label">Claude Code Integration</div>
-      <div class="ai-title">AI 才是笔记交互的终极 UI</div>
-      <div class="ai-grid">
-        <div class="ai-item">
-          <div class="ai-item-title">SYSTEM LEVEL</div>
-          <div class="ai-item-desc">每个文件夹的 CLAUDE.md 让 Claude 完美理解你的系统</div>
-        </div>
-        <div class="ai-item">
-          <div class="ai-item-title">AUTO MANAGER</div>
-          <div class="ai-item-desc">「处理我的收件箱」→ AI 精准分配类别和主题</div>
-        </div>
-        <div class="ai-item">
-          <div class="ai-item-title">BATCH OPS</div>
-          <div class="ai-item-desc">几十条笔记，几十秒内更新完毕</div>
-        </div>
-        <div class="ai-item">
-          <div class="ai-item-title">DEEP CREATE</div>
-          <div class="ai-item-desc">综合关联笔记，用你的语气生成深度内容</div>
+    </section>
+
+    <!-- Slide 4: AI Integration -->
+    <section class="slide slide-content-bg" data-slide="4">
+      <div class="slide-content">
+        <div class="big-number reveal">03</div>
+        <h2 class="reveal reveal-delay-1">Claude Code <span class="accent">Integration</span></h2>
+        <p class="reveal reveal-delay-2" style="margin-bottom: 1.5rem;">AI 才是笔记交互的终极 UI</p>
+        <div class="card-grid reveal reveal-delay-3">
+          <div class="card">
+            <h3>SYSTEM LEVEL</h3>
+            <p>每个文件夹的 CLAUDE.md 让 Claude 完美理解你的系统</p>
+          </div>
+          <div class="card">
+            <h3>AUTO MANAGER</h3>
+            <p>「处理我的收件箱」→ AI 精准分配类别和主题</p>
+          </div>
+          <div class="card">
+            <h3>BATCH OPS</h3>
+            <p>几十条笔记，几十秒内更新完毕</p>
+          </div>
+          <div class="card">
+            <h3>DEEP CREATE</h3>
+            <p>综合关联笔记，用你的语气生成深度内容</p>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div class="quote-box">
-      <div class="quote-text">「文件夹系统底层的假设是错误的——你不需要成为那个疲于奔命的图书管理员。」</div>
-      <div class="quote-source">— Noah Vincent, Obsidian Bases + Claude Code</div>
-    </div>
-    
-    <div class="footer">
-      <div class="footer-left">THEO INFOCARD</div>
-      <div class="tag">Liteseed Method</div>
-    </div>
+    </section>
+
+    <!-- Slide 5: Quote -->
+    <section class="slide slide-quote" data-slide="5">
+      <div class="slide-content">
+        <h2 class="reveal" style="font-style: italic;">「文件夹系统底层的假设是错误的</h2>
+        <p class="reveal reveal-delay-1" style="font-size: clamp(1.25rem, 3vw, 2rem); color: var(--fg-primary);">
+          ——你不需要成为那个疲于奔命的图书管理员。」
+        </p>
+        <div class="accent-line reveal reveal-delay-2"></div>
+        <p class="reveal reveal-delay-3" style="color: var(--fg-secondary);">— Noah Vincent, Obsidian Bases + Claude Code</p>
+      </div>
+    </section>
   </div>
+
+  <nav class="nav-dots">
+    <button class="nav-dot active" data-slide="1" aria-label="Slide 1"></button>
+    <button class="nav-dot" data-slide="2" aria-label="Slide 2"></button>
+    <button class="nav-dot" data-slide="3" aria-label="Slide 3"></button>
+    <button class="nav-dot" data-slide="4" aria-label="Slide 4"></button>
+    <button class="nav-dot" data-slide="5" aria-label="Slide 5"></button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.nav-dot');
+    let currentSlide = 1;
+
+    function goToSlide(num) {
+      if (num < 1) num = 1;
+      if (num > slides.length) num = slides.length;
+      slides.forEach(s => s.classList.remove('active'));
+      dots.forEach(d => d.classList.remove('active'));
+      document.querySelector(`[data-slide="${num}"]`).classList.add('active');
+      document.querySelector(`.nav-dot[data-slide="${num}"]`).classList.add('active');
+      currentSlide = num;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goToSlide(currentSlide + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); goToSlide(currentSlide - 1); }
+    });
+
+    dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.slide))));
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => touchStartX = e.changedTouches[0].screenX);
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) diff > 0 ? goToSlide(currentSlide + 1) : goToSlide(currentSlide - 1);
+    });
+
+    let wheelTimeout;
+    document.addEventListener('wheel', (e) => {
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => e.deltaY > 0 ? goToSlide(currentSlide + 1) : goToSlide(currentSlide - 1), 50);
+    }, { passive: true });
+  </script>
 </body>
 </html>
